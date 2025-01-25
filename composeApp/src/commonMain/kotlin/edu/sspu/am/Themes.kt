@@ -19,6 +19,7 @@ object ColorSchemes {
         onTertiary = Color(0xFF333333), // 文字disable时的颜色
         tertiaryContainer = Color(0xFFCCCCCC),
         onTertiaryContainer = Color(0xFF888888),
+        onBackground = Color(0xFFDDDDDD), // 背景disable时的颜色
     )
     val dark = darkColorScheme(
         // 明色
@@ -34,5 +35,6 @@ object ColorSchemes {
         onTertiary = Color(0xFFE0E0E0), // 文字disable时的颜色
         tertiaryContainer = Color(0xFF333333),
         onTertiaryContainer = Color(0xFF666666),
+        onBackground = Color(0xFF222222), // 背景disable时的颜色
     )
 }
