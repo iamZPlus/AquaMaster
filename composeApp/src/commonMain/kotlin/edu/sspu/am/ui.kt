@@ -610,6 +610,49 @@ class UI : ViewModel() {
                 }
             }
 
+            val ai = MachineAISettings
+
+            object MachineAISettings {
+                val operateWhenAlarm = AIOperateWhenAlarm
+
+                object AIOperateWhenAlarm {
+                    private val _enable = MutableStateFlow(false)
+                    val enable = _enable.asStateFlow()
+
+                    fun on() {
+                        _enable.value = true
+                    }
+
+                    fun off() {
+                        _enable.value = false
+                    }
+
+                    fun switch() {
+                        _enable.value = !_enable.value
+                    }
+                }
+
+                val operateWhenWarning = AIOperateWhenWarning
+
+                object AIOperateWhenWarning {
+                    private val _enable = MutableStateFlow(false)
+                    val enable = _enable.asStateFlow()
+
+                    fun on() {
+                        _enable.value = true
+                    }
+
+                    fun off() {
+                        _enable.value = false
+                    }
+
+                    fun switch() {
+                        _enable.value = !_enable.value
+                    }
+                }
+            }
+
+
             val running = RunningData
 
             object RunningData {
