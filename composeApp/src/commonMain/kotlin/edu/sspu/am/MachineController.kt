@@ -50,6 +50,107 @@ import edu.sspu.am.MachineType.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MachineController(
+    ui: UI,
+    modifier: Modifier = Modifier,
+    machine: MachineData? = null
+) {
+    val font by ui.font.collectAsState()
+
+    val isRefreshing by ui.settings.machine.refreshing.enable.collectAsState()
+    val pullToRefreshState = rememberPullToRefreshState()
+
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            ui.settings.machine.refreshing.on()
+            ui.scope.launch {
+                delay(3000)
+                ui.settings.machine.refreshing.off()
+            }
+        },
+        modifier = modifier,
+        state = pullToRefreshState,
+        indicator = {
+            if ((ui.device.value != DeviceType.Desktop) or isRefreshing) {
+                Card(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .align(Alignment.TopCenter)
+                        .pullToRefreshIndicator(
+                            state = pullToRefreshState,
+                            isRefreshing = isRefreshing,
+                        ),
+                    shape = CircleShape,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        Crossfade(
+                            targetState = isRefreshing,
+                            modifier = Modifier.align(Alignment.Center),
+                            animationSpec = tween()
+                        ) {
+                            if (it) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .size(30.dp)
+                                        .align(Alignment.Center)
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Outlined.CloudDownload,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(30.dp)
+                                        .align(Alignment.Center)
+                                        .graphicsLayer {
+                                            val progress = pullToRefreshState.distanceFraction.coerceIn(0f, 1f)
+                                            this.alpha = progress
+                                            this.scaleX = progress
+                                            this.scaleY = progress
+                                        },
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ) {
+        if (machine != null) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    MachineBaseInfoCard(
+                        ui = ui,
+                        modifier = Modifier.fillMaxWidth(),
+                        machine = machine
+                    )
+                }
+
+                if (machine.url != null) {
+                    item {
+                        MachineCoreVersionInfoCard(
+                            ui = ui,
+                            modifier = Modifier.fillMaxWidth(),
+                            url = machine.url
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun MachineBaseInfoCard(
@@ -235,105 +336,3 @@ fun MachineCoreVersionInfoCard(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MachineController(
-    ui: UI,
-    modifier: Modifier = Modifier,
-    machine: MachineData? = null
-) {
-    val font by ui.font.collectAsState()
-
-    val isRefreshing by ui.settings.machine.refreshing.enable.collectAsState()
-    val pullToRefreshState = rememberPullToRefreshState()
-
-    PullToRefreshBox(
-        isRefreshing = isRefreshing,
-        onRefresh = {
-            ui.settings.machine.refreshing.on()
-            ui.scope.launch {
-                delay(3000)
-                ui.settings.machine.refreshing.off()
-            }
-        },
-        modifier = modifier,
-        state = pullToRefreshState,
-        indicator = {
-            if ((ui.device.value != DeviceType.Desktop) or isRefreshing) {
-                Card(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .align(Alignment.TopCenter)
-                        .pullToRefreshIndicator(
-                            state = pullToRefreshState,
-                            isRefreshing = isRefreshing,
-                        ),
-                    shape = CircleShape,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
-                        Crossfade(
-                            targetState = isRefreshing,
-                            modifier = Modifier.align(Alignment.Center),
-                            animationSpec = tween()
-                        ) {
-                            if (it) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .size(30.dp)
-                                        .align(Alignment.Center)
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = Icons.Outlined.CloudDownload,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(30.dp)
-                                        .align(Alignment.Center)
-                                        .graphicsLayer {
-                                            val progress = pullToRefreshState.distanceFraction.coerceIn(0f, 1f)
-                                            this.alpha = progress
-                                            this.scaleX = progress
-                                            this.scaleY = progress
-                                        },
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    ) {
-        if (machine != null) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    MachineBaseInfoCard(
-                        ui = ui,
-                        modifier = Modifier.fillMaxWidth(),
-                        machine = machine
-                    )
-                }
-
-                if (machine.url != null) {
-                    item {
-                        MachineCoreVersionInfoCard(
-                            ui = ui,
-                            modifier = Modifier.fillMaxWidth(),
-                            url = machine.url
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
