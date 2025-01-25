@@ -35,6 +35,11 @@ fun App(
                     modifier = Modifier.fillMaxSize()
                 )
 
+                ui childMatch RootScreens.Personal -> Personal(
+                    ui = ui,
+                    modifier = Modifier.fillMaxSize()
+                )
+
                 // 设置
                 ui childMatch RootScreens.Settings -> Settings(
                     ui = ui,
