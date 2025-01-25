@@ -2,6 +2,7 @@ package edu.sspu.am
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.outlined.Api
 import androidx.compose.material.icons.outlined.Cloud
 import androidx.compose.material.icons.outlined.CloudDownload
@@ -163,6 +165,76 @@ fun MachineBaseInfoCard(
     }
 }
 
+@Composable
+fun MachineCoreVersionInfoCard(
+    ui: UI,
+    modifier: Modifier = Modifier,
+    url: MachineUrl
+) {
+    val font by ui.font.collectAsState()
+
+    val version = when (url) {
+        is MachineUrl.Local -> "v1.0.0rc1" // TODO: 获取内核版本
+        is MachineUrl.Cloud -> "v1.0.0rc1" // TODO: 获取内核版本
+        is MachineUrl.Remote -> "v1.0.0rc1" // TODO: 获取内核版本
+        is MachineUrl.Blank -> "Blank~NoV"
+        is MachineUrl.Template -> "v1.0.0rc1~v1.0.0rc9" // TODO: 获取模板支持的版本
+        is MachineUrl.Group -> "v1.0.0rc1" // TODO: 获取组合的内核版本
+        is MachineUrl.Virtual -> "Virtual~NoV"
+    }
+
+    Card(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .align(Alignment.Start)
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 16.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(end = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Memory,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(50.dp),
+                    tint = MaterialTheme.colorScheme.inversePrimary
+                )
+            }
+
+            Column(
+                Modifier
+                    .align(Alignment.CenterVertically)
+            ) {
+                Text(
+                    text = "内核版本",
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.inversePrimary,
+                    fontWeight = FontWeight.Black,
+                    fontFamily = font
+                )
+
+                Text(
+                    text = version,
+                    fontSize = 24.sp,
+                    color = MaterialTheme.colorScheme.inversePrimary,
+                    fontWeight = FontWeight.Black,
+                    fontFamily = font
+                )
+            }
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -241,7 +313,8 @@ fun MachineController(
     ) {
         if (machine != null) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
                     MachineBaseInfoCard(
@@ -249,6 +322,16 @@ fun MachineController(
                         modifier = Modifier.fillMaxWidth(),
                         machine = machine
                     )
+                }
+
+                if (machine.url != null) {
+                    item {
+                        MachineCoreVersionInfoCard(
+                            ui = ui,
+                            modifier = Modifier.fillMaxWidth(),
+                            url = machine.url
+                        )
+                    }
                 }
             }
         }
