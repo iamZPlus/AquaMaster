@@ -1,5 +1,6 @@
 package edu.sspu.am
 
+import KottieAnimation
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +16,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.WifiTetheringOff
 import androidx.compose.material.icons.outlined.Api
 import androidx.compose.material.icons.outlined.Cloud
 import androidx.compose.material.icons.outlined.CloudDownload
@@ -37,8 +40,12 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -49,6 +56,10 @@ import androidx.compose.ui.unit.sp
 import edu.sspu.am.MachineType.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kottieComposition.KottieCompositionSpec
+import kottieComposition.animateKottieCompositionAsState
+import kottieComposition.rememberKottieComposition
+import utils.KottieConstants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -135,6 +146,14 @@ fun MachineController(
                         ui = ui,
                         modifier = Modifier.fillMaxWidth(),
                         machine = machine
+                    )
+                }
+
+                item {
+                    MachineConnectionInfoCard(
+                        ui = ui,
+                        modifier = Modifier.fillMaxWidth(),
+                        url = machine.url
                     )
                 }
 
@@ -268,6 +287,149 @@ fun MachineBaseInfoCard(
                     fontWeight = FontWeight.Medium,
                     fontFamily = font,
                     lineHeight = 16.sp,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun MachineConnectionInfoCard(
+    ui: UI,
+    modifier: Modifier = Modifier,
+    url: MachineUrl? = null
+) {
+    val font by ui.font.collectAsState()
+
+    var connected by remember { mutableStateOf(if (url != null) null else false) }
+    var info by remember { mutableStateOf("") }
+
+    // TODO: 获取连接状态
+    connected = true
+    info = "网络状态良好, 连接稳定"
+
+//    connected = null
+//    info = "正在尝试连接${url?.display ?: "null"}"
+
+//    connected = false
+//    info = "无法连接到${url?.display ?: "null"}"
+
+    Card(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .align(Alignment.Start)
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 16.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(horizontal = 8.dp)
+            ) {
+
+                when (connected) {
+                    true -> {
+                        val wifiConnectedComposition = rememberKottieComposition(
+                            spec = KottieCompositionSpec.JsonString(WIFI_CONNECTED)
+                        )
+                        val wifiConnectedAnimationState by animateKottieCompositionAsState(
+                            composition = wifiConnectedComposition,
+                            isPlaying = true,
+                            iterations = KottieConstants.IterateForever
+                        )
+                        KottieAnimation(
+                            composition = wifiConnectedComposition,
+                            progress = { wifiConnectedAnimationState.progress },
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(30.dp)
+                        )
+                    }
+
+                    false -> {
+                        Icon(
+                            imageVector = Icons.Default.WifiTetheringOff,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(30.dp),
+                            tint = MaterialTheme.colorScheme.inversePrimary
+                        )
+                    }
+
+                    null -> {
+                        val wifiConnectingComposition = rememberKottieComposition(
+                            spec = KottieCompositionSpec.JsonString(WIFI_CONNECTING)
+                        )
+                        val wifiConnectingAnimationState by animateKottieCompositionAsState(
+                            composition = wifiConnectingComposition,
+                            isPlaying = true,
+                            iterations = KottieConstants.IterateForever
+                        )
+                        KottieAnimation(
+                            composition = wifiConnectingComposition,
+                            progress = { wifiConnectingAnimationState.progress },
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(30.dp)
+                        )
+                    }
+                }
+            }
+
+            Column(
+                Modifier
+                    .align(Alignment.CenterVertically)
+            ) {
+                Row {
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Circle,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(18.dp),
+                            tint = when (connected) {
+                                true -> Color(0xFF3DE1AD)
+                                false -> Color(0xFFF00056)
+                                null -> Color(0xFFFFA400)
+                            }
+                        )
+                    }
+
+                    Text(
+                        text = when (connected) {
+                            true -> "连接成功"
+                            false -> "连接失败"
+                            null -> "连接中..."
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically),
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.inversePrimary,
+                        fontWeight = FontWeight.Black,
+                        fontFamily = font
+                    )
+                }
+
+                Text(
+                    text = info,
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = font,
+                    lineHeight = 12.sp
                 )
             }
         }
