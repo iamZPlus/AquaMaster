@@ -191,6 +191,7 @@ fun MachineController(
                             enable = enableControl
                         )
                     }
+
                     item {
                         MachineAlarmToAdministerSettingCard(
                             ui = ui,
@@ -199,6 +200,7 @@ fun MachineController(
                             enable = enableControl
                         )
                     }
+
                     item {
                         MachineWarningToAdministerSettingCard(
                             ui = ui,
@@ -207,6 +209,7 @@ fun MachineController(
                             enable = enableControl
                         )
                     }
+
                     item {
                         MachineAlarmToAISettingCard(
                             ui = ui,
@@ -215,6 +218,7 @@ fun MachineController(
                             enable = enableControl
                         )
                     }
+
                     item {
                         MachineWarningToAISettingCard(
                             ui = ui,
