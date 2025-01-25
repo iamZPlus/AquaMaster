@@ -267,7 +267,7 @@ fun MachineCard(
                             Blank -> Icons.Outlined.HideSource
                             Template -> Icons.Outlined.TableView
                             Group -> Icons.Outlined.GroupWork
-                            Virtual -> Icons.Outlined.Api
+                            Virtual -> Icons.Outlined.Api // TODO: 正式上线时删除这部分
                         },
                         contentDescription = null,
                         modifier = Modifier

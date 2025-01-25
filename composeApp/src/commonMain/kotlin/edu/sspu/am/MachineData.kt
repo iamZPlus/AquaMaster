@@ -122,11 +122,13 @@ sealed class MachineUrl {
         override val display get() = "group://$server/g/$id"
     }
 
+    // TODO: 正式上线时删除这部分
     @Serializable
     data object Virtual : MachineUrl() {
         override val url get() = ""
         override val display get() = "Virtual~"
     }
+    // TODO: 虚拟设备只在软件测试时起作用
 }
 
 

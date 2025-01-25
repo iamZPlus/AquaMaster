@@ -62,6 +62,8 @@ class MainActivity : ComponentActivity() {
 
         ui.settings.developerMode.on()
         ui.settings.developerMode.fastJumper.one.target set "@app.Settings.other.DeveloperMode"
+
+        // TODO: 正式上线时删除这部分
         ui.data.list.append(
             MachineCategory(
                 name = "测试",

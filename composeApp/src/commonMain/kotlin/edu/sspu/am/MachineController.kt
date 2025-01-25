@@ -194,7 +194,7 @@ fun MachineBaseInfoCard(
                         Blank -> Icons.Outlined.HideSource
                         Template -> Icons.Outlined.TableView
                         Group -> Icons.Outlined.GroupWork
-                        Virtual -> Icons.Outlined.Api
+                        Virtual -> Icons.Outlined.Api // TODO: 正式上线时删除这部分
                     },
                     contentDescription = null,
                     modifier = Modifier
@@ -243,7 +243,7 @@ fun MachineBaseInfoCard(
                                         Blank -> "空集"
                                         Template -> "模板"
                                         Group -> "组合"
-                                        Virtual -> "虚拟"
+                                        Virtual -> "虚拟" // TODO: 正式上线时删除这部分
                                     },
                                     modifier = Modifier
                                         .align(Alignment.CenterHorizontally)
@@ -289,7 +289,7 @@ fun MachineCoreVersionInfoCard(
         is MachineUrl.Blank -> "Blank~NoV"
         is MachineUrl.Template -> "v1.0.0rc1~v1.0.0rc9" // TODO: 获取模板支持的版本
         is MachineUrl.Group -> "v1.0.0rc1" // TODO: 获取组合的内核版本
-        is MachineUrl.Virtual -> "Virtual~NoV"
+        is MachineUrl.Virtual -> "Virtual~NoV" // TODO: 正式上线时删除这部分
     }
 
     Card(
