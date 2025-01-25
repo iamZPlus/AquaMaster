@@ -154,7 +154,7 @@ fun MachineController(
         if (machine != null) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 item {
                     MachineBaseInfoCard(
