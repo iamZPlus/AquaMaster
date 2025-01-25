@@ -1042,11 +1042,11 @@ class UI : ViewModel() {
             private val _categories = MutableStateFlow<SnapshotStateList<MachineCategory>>(mutableStateListOf())
             val categories = _categories.asStateFlow()
 
-            fun append(category: MachineCategory) {
+            infix fun append(category: MachineCategory) {
                 _categories.value.add(category)
             }
 
-            fun remove(category: MachineCategory) {
+            infix fun remove(category: MachineCategory) {
                 _categories.value.remove(category)
             }
 
