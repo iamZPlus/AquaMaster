@@ -146,6 +146,14 @@ fun MachineController(
                             url = machine.url
                         )
                     }
+
+                    item {
+                        MachineControlCard(
+                            ui = ui,
+                            modifier = Modifier.fillMaxWidth(),
+                            url = machine.url
+                        )
+                    }
                 }
             }
         }
@@ -336,3 +344,10 @@ fun MachineCoreVersionInfoCard(
     }
 }
 
+@Composable
+fun MachineControlCard(
+    ui: UI,
+    modifier: Modifier = Modifier,
+    url: MachineUrl
+) {
+}
