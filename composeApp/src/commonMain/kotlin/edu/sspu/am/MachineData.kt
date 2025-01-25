@@ -1,5 +1,6 @@
 package edu.sspu.am
 
+import androidx.annotation.IntRange
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Star
@@ -131,4 +132,44 @@ sealed class MachineUrl {
     // TODO: 虚拟设备只在软件测试时起作用
 }
 
+data class MachineRunningData(
+    val limit: MachineRunningLimit = MachineRunningLimit(),
+    val power: MachineRunningPower = MachineRunningPower()
+)
 
+data class MachineRunningLimit(
+    val alarmToAdminister: MachineRunningLimitData = MachineRunningLimitData(),
+    val alarmToAI: MachineRunningLimitData = MachineRunningLimitData(),
+    val warningToAdminister: MachineRunningLimitData = MachineRunningLimitData(),
+    val warningToAI: MachineRunningLimitData = MachineRunningLimitData()
+)
+
+data class MachineRunningLimitData(
+    val air: AirLimit = AirLimit(),
+    val soil: SoilLimit = SoilLimit()
+)
+
+data class AirLimit(
+    val temperature: TemperatureLimit = TemperatureLimit(),
+    val humidity: HumidityLimit = HumidityLimit()
+)
+
+data class SoilLimit(
+    val temperature: TemperatureLimit = TemperatureLimit(),
+    val humidity: HumidityLimit = HumidityLimit()
+)
+
+data class TemperatureLimit(
+    @IntRange(from = 0, to = 100) val lower: Int = 0,
+    @IntRange(from = 0, to = 100) val upper: Int = 100
+)
+
+data class HumidityLimit(
+    @IntRange(from = 0, to = 100) val lower: Int = 0,
+    @IntRange(from = 0, to = 100) val upper: Int = 100
+)
+
+data class MachineRunningPower(
+    @IntRange(from = 0, to = 100) val wind: Int = 0,
+    @IntRange(from = 0, to = 100) val water: Int = 0,
+)
