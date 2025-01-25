@@ -88,6 +88,8 @@ fun MachineController(
     val isRefreshing by ui.settings.machine.refreshing.enable.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
 
+    var enableControl = remember { mutableStateOf(true) }
+
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = {
@@ -185,7 +187,40 @@ fun MachineController(
                         MachineControlCard(
                             ui = ui,
                             modifier = Modifier.fillMaxWidth(),
-                            url = machine.url
+                            url = machine.url,
+                            enable = enableControl
+                        )
+                    }
+                    item {
+                        MachineAlarmToAdministerSettingCard(
+                            ui = ui,
+                            modifier = Modifier.fillMaxWidth(),
+                            url = machine.url,
+                            enable = enableControl
+                        )
+                    }
+                    item {
+                        MachineWarningToAdministerSettingCard(
+                            ui = ui,
+                            modifier = Modifier.fillMaxWidth(),
+                            url = machine.url,
+                            enable = enableControl
+                        )
+                    }
+                    item {
+                        MachineAlarmToAISettingCard(
+                            ui = ui,
+                            modifier = Modifier.fillMaxWidth(),
+                            url = machine.url,
+                            enable = enableControl
+                        )
+                    }
+                    item {
+                        MachineWarningToAISettingCard(
+                            ui = ui,
+                            modifier = Modifier.fillMaxWidth(),
+                            url = machine.url,
+                            enable = enableControl
                         )
                     }
                 }
@@ -532,8 +567,6 @@ fun MachineControlCard(
     val font by ui.font.collectAsState()
 
     val enableControl by enable
-    val enableAIOperateWhenAlarm by ui.settings.machine.ai.operateWhenAlarm.enable.collectAsState()
-    val enableAIOperateWhenWarning by ui.settings.machine.ai.operateWhenWarning.enable.collectAsState()
 
     Column(
         modifier = modifier
@@ -730,11 +763,27 @@ fun MachineControlCard(
                 }
             )
         }
+    }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MachineAlarmToAdministerSettingCard(
+    ui: UI,
+    modifier: Modifier = Modifier,
+    url: MachineUrl,
+    enable: MutableState<Boolean> = remember { mutableStateOf(true) }
+) {
+    val font by ui.font.collectAsState()
 
+    val enableControl by enable
+
+    Column(
+        modifier = modifier
+    ) {
         Text(
             text = "管理员警报设置",
-            modifier = Modifier.padding(top = 24.dp, start = 12.dp, end = 12.dp, bottom = 6.dp),
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp),
             fontSize = 16.sp,
             color = if (enableControl)
                 MaterialTheme.colorScheme.inversePrimary
@@ -1170,10 +1219,27 @@ fun MachineControlCard(
                 }
             )
         }
+    }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MachineWarningToAdministerSettingCard(
+    ui: UI,
+    modifier: Modifier = Modifier,
+    url: MachineUrl,
+    enable: MutableState<Boolean> = remember { mutableStateOf(true) }
+) {
+    val font by ui.font.collectAsState()
+
+    val enableControl by enable
+
+    Column(
+        modifier = modifier
+    ) {
         Text(
             text = "管理员提醒设置",
-            modifier = Modifier.padding(top = 24.dp, start = 12.dp, end = 12.dp, bottom = 6.dp),
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp),
             fontSize = 16.sp,
             color = if (enableControl)
                 MaterialTheme.colorScheme.inversePrimary
@@ -1609,10 +1675,28 @@ fun MachineControlCard(
                 }
             )
         }
+    }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MachineAlarmToAISettingCard(
+    ui: UI,
+    modifier: Modifier = Modifier,
+    url: MachineUrl,
+    enable: MutableState<Boolean> = remember { mutableStateOf(true) }
+) {
+    val font by ui.font.collectAsState()
+
+    val enableControl by enable
+    val enableAIOperateWhenAlarm by ui.settings.machine.ai.operateWhenAlarm.enable.collectAsState()
+
+    Column(
+        modifier = modifier
+    ) {
         Text(
             text = "AI警报介入设置",
-            modifier = Modifier.padding(top = 24.dp, start = 12.dp, end = 12.dp, bottom = 6.dp),
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp),
             fontSize = 16.sp,
             color = if (enableControl and enableAIOperateWhenAlarm)
                 MaterialTheme.colorScheme.inversePrimary
@@ -2048,10 +2132,28 @@ fun MachineControlCard(
                 }
             )
         }
+    }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MachineWarningToAISettingCard(
+    ui: UI,
+    modifier: Modifier = Modifier,
+    url: MachineUrl,
+    enable: MutableState<Boolean> = remember { mutableStateOf(true) }
+) {
+    val font by ui.font.collectAsState()
+
+    val enableControl by enable
+    val enableAIOperateWhenWarning by ui.settings.machine.ai.operateWhenWarning.enable.collectAsState()
+
+    Column(
+        modifier = modifier
+    ) {
         Text(
             text = "AI提醒介入设置",
-            modifier = Modifier.padding(top = 24.dp, start = 12.dp, end = 12.dp, bottom = 6.dp),
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp),
             fontSize = 16.sp,
             color = if (enableControl and enableAIOperateWhenWarning)
                 MaterialTheme.colorScheme.inversePrimary
