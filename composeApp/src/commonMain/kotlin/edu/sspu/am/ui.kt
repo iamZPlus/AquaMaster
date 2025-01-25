@@ -616,6 +616,8 @@ class UI : ViewModel() {
                 val limit = RunningLimit
 
                 object RunningLimit {
+                    val alarm = AlarmTo
+
                     object AlarmTo {
                         val administer = AlarmToAdminister
 
@@ -794,6 +796,7 @@ class UI : ViewModel() {
                         }
                     }
 
+                    val warning = WarningTo
                     object WarningTo {
                         val administer = WarningToAdminister
 
