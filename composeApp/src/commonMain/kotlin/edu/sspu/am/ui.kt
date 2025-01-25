@@ -1,5 +1,6 @@
 package edu.sspu.am
 
+import androidx.annotation.IntRange
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LightMode
@@ -606,6 +607,404 @@ class UI : ViewModel() {
 
                 fun switch() {
                     _enable.value = !_enable.value
+                }
+            }
+
+            val running = RunningData
+
+            object RunningData {
+                val limit = RunningLimit
+
+                object RunningLimit {
+                    object AlarmTo {
+                        val administer = AlarmToAdminister
+
+                        object AlarmToAdminister {
+                            val air = AlarmToAdministerAirLimit
+
+                            object AlarmToAdministerAirLimit {
+                                val lower = AlarmToAdministerAirLimitLower
+
+                                object AlarmToAdministerAirLimitLower {
+                                    private val _current = MutableStateFlow(0)
+                                    val current = _current.asStateFlow()
+
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+
+                                val upper = AlarmToAdministerAirLimitUpper
+
+                                object AlarmToAdministerAirLimitUpper {
+                                    private val _current = MutableStateFlow(100)
+                                    val current = _current.asStateFlow()
+
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+                            }
+
+                            val soil = AlarmToAdministerSoilLimit
+
+                            object AlarmToAdministerSoilLimit {
+                                val lower = AlarmToAdministerSoilLimitLower
+
+                                object AlarmToAdministerSoilLimitLower {
+                                    private val _current = MutableStateFlow(0)
+                                    val current = _current.asStateFlow()
+
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+
+                                val upper = AlarmToAdministerSoilLimitUpper
+
+                                object AlarmToAdministerSoilLimitUpper {
+                                    private val _current = MutableStateFlow(100)
+                                    val current = _current.asStateFlow()
+
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+                            }
+                        }
+
+                        val ai = AlarmToAI
+
+                        object AlarmToAI {
+                            val air = AlarmToAIAirLimit
+
+                            object AlarmToAIAirLimit {
+                                val lower = AlarmToAIAirLimitLower
+
+                                object AlarmToAIAirLimitLower {
+                                    private val _current = MutableStateFlow(0)
+                                    val current = _current.asStateFlow()
+
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+
+                                val upper = AlarmToAIAirLimitUpper
+
+                                object AlarmToAIAirLimitUpper {
+                                    private val _current = MutableStateFlow(100)
+                                    val current = _current.asStateFlow()
+
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+                            }
+
+                            val soil = AlarmToAISoilLimit
+
+                            object AlarmToAISoilLimit {
+                                val lower = AlarmToAISoilLimitLower
+
+                                object AlarmToAISoilLimitLower {
+                                    private val _current = MutableStateFlow(0)
+                                    val current = _current.asStateFlow()
+
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+
+                                val upper = AlarmToAISoilLimitUpper
+
+                                object AlarmToAISoilLimitUpper {
+                                    private val _current = MutableStateFlow(100)
+                                    val current = _current.asStateFlow()
+
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    object WarningTo {
+                        val administer = WarningToAdminister
+
+                        object WarningToAdminister {
+                            val air = WarningToAdministerAirLimit
+
+                            object WarningToAdministerAirLimit {
+                                val lower = WarningToAdministerAirLimitLower
+
+                                object WarningToAdministerAirLimitLower {
+                                    private val _current = MutableStateFlow(0)
+                                    val current = _current.asStateFlow()
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+
+                                val upper = WarningToAdministerAirLimitUpper
+
+                                object WarningToAdministerAirLimitUpper {
+                                    private val _current = MutableStateFlow(100)
+                                    val current = _current.asStateFlow()
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+                            }
+
+                            val soil = WarningToAdministerSoilLimit
+
+                            object WarningToAdministerSoilLimit {
+                                val lower = WarningToAdministerSoilLimitLower
+
+                                object WarningToAdministerSoilLimitLower {
+                                    private val _current = MutableStateFlow(0)
+                                    val current = _current.asStateFlow()
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+
+                                val upper = WarningToAdministerSoilLimitUpper
+
+                                object WarningToAdministerSoilLimitUpper {
+                                    private val _current = MutableStateFlow(100)
+                                    val current = _current.asStateFlow()
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+                            }
+                        }
+
+                        val ai = WarningToAI
+
+                        object WarningToAI {
+                            val air = WarningToAIAirLimit
+
+                            object WarningToAIAirLimit {
+                                val lower = WarningToAIAirLimitLower
+
+                                object WarningToAIAirLimitLower {
+                                    private val _current = MutableStateFlow(0)
+                                    val current = _current.asStateFlow()
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+
+                                val upper = WarningToAIAirLimitUpper
+
+                                object WarningToAIAirLimitUpper {
+                                    private val _current = MutableStateFlow(100)
+                                    val current = _current.asStateFlow()
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+                            }
+
+                            val soil = WarningToAISoilLimit
+
+                            object WarningToAISoilLimit {
+                                val lower = WarningToAISoilLimitLower
+
+                                object WarningToAISoilLimitLower {
+                                    private val _current = MutableStateFlow(0)
+                                    val current = _current.asStateFlow()
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+
+                                val upper = WarningToAISoilLimitUpper
+
+                                object WarningToAISoilLimitUpper {
+                                    private val _current = MutableStateFlow(100)
+                                    val current = _current.asStateFlow()
+                                    infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                                        _current.value = value
+                                    }
+
+                                    fun increment() {
+                                        if (current.value > 0) _current.value++
+                                    }
+
+                                    fun decrement() {
+                                        if (current.value < 100) _current.value--
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                val power = RunningPower
+
+                object RunningPower {
+                    val wind = WindRunningPower
+
+                    object WindRunningPower {
+                        private val _current = MutableStateFlow(0)
+                        val current = _current.asStateFlow()
+
+                        infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                            _current.value = value
+                        }
+
+                        fun increment() {
+                            if (current.value > 0) _current.value++
+                        }
+
+                        fun decrement() {
+                            if (current.value < 100) _current.value--
+                        }
+                    }
+
+                    val water = WaterRunningPower
+
+                    object WaterRunningPower {
+                        private val _current = MutableStateFlow(0)
+                        val current = _current.asStateFlow()
+
+                        infix fun set(@IntRange(from = 0, to = 100) value: Int) {
+                            _current.value = value
+                        }
+
+                        fun increment() {
+                            if (current.value > 0) _current.value++
+                        }
+
+                        fun decrement() {
+                            if (current.value < 100) _current.value--
+                        }
+                    }
                 }
             }
         }
