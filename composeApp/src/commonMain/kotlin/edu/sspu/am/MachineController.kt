@@ -286,7 +286,7 @@ fun MachineBaseInfoCard(
                     color = MaterialTheme.colorScheme.onTertiary,
                     fontWeight = FontWeight.Medium,
                     fontFamily = font,
-                    lineHeight = 16.sp,
+                    lineHeight = 12.sp,
                 )
             }
         }
