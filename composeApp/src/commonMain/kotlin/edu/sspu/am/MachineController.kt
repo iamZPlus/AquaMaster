@@ -3,12 +3,15 @@ package edu.sspu.am
 import KottieAnimation
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,8 +20,12 @@ import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.FormatColorReset
 import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.ModeFanOff
+import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material.icons.filled.WifiTetheringOff
+import androidx.compose.material.icons.filled.WindPower
 import androidx.compose.material.icons.outlined.Api
 import androidx.compose.material.icons.outlined.Cloud
 import androidx.compose.material.icons.outlined.CloudDownload
@@ -26,6 +33,8 @@ import androidx.compose.material.icons.outlined.GroupWork
 import androidx.compose.material.icons.outlined.HideSource
 import androidx.compose.material.icons.outlined.Print
 import androidx.compose.material.icons.outlined.TableView
+import androidx.compose.material.icons.outlined.WaterDrop
+import androidx.compose.material.icons.outlined.WindPower
 import androidx.compose.material.icons.outlined._5g
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,11 +42,16 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.RangeSliderState
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.pullToRefreshIndicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,6 +74,7 @@ import kottieComposition.KottieCompositionSpec
 import kottieComposition.animateKottieCompositionAsState
 import kottieComposition.rememberKottieComposition
 import utils.KottieConstants
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -506,10 +521,1971 @@ fun MachineCoreVersionInfoCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MachineControlCard(
     ui: UI,
     modifier: Modifier = Modifier,
-    url: MachineUrl
+    url: MachineUrl,
+    enable: MutableState<Boolean> = remember { mutableStateOf(true) }
 ) {
+    val font by ui.font.collectAsState()
+
+    val enableControl by enable
+    val enableAIOperateWhenAlarm by ui.settings.machine.ai.operateWhenAlarm.enable.collectAsState()
+    val enableAIOperateWhenWarning by ui.settings.machine.ai.operateWhenWarning.enable.collectAsState()
+
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text = "设备操控",
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp),
+            fontSize = 16.sp,
+            color = if (enableControl)
+                MaterialTheme.colorScheme.inversePrimary
+            else
+                MaterialTheme.colorScheme.onTertiary,
+            fontWeight = FontWeight.Medium,
+            fontFamily = font
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.cardColors(
+                containerColor = if (enableControl)
+                    MaterialTheme.colorScheme.primaryContainer
+                else
+                    MaterialTheme.colorScheme.tertiaryContainer
+            )
+        ) {
+            val windState = remember {
+                SliderState(
+                    value = ui.settings.machine.running.power.wind.current.value.toFloat(),
+                    valueRange = 0f..100f
+                )
+            }
+            windState.onValueChangeFinished = {
+                ui.settings.machine.running.power.wind set windState.value.toInt()
+            }
+
+            val waterState = remember {
+                SliderState(
+                    value = ui.settings.machine.running.power.water.current.value.toFloat(),
+                    valueRange = 0f..100f
+                )
+            }
+            waterState.onValueChangeFinished = {
+                ui.settings.machine.running.power.water set waterState.value.toInt()
+            }
+
+            Slider(
+                state = windState,
+                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl,
+                thumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl)
+                                MaterialTheme.colorScheme.background
+                            else
+                                MaterialTheme.colorScheme.onBackground,
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.onTertiaryContainer
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.value / 100f)
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                            ) {
+                                Icon(
+                                    imageVector = when (it.value) {
+                                        0f -> Icons.Default.ModeFanOff
+                                        100f -> Icons.Filled.WindPower
+                                        else -> Icons.Outlined.WindPower
+                                    },
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                        .size(32.dp),
+                                    tint = if (enableControl)
+                                        MaterialTheme.colorScheme.onPrimary
+                                    else
+                                        MaterialTheme.colorScheme.tertiaryContainer
+                                )
+                            }
+
+                            Text(
+                                text = "${it.value.toInt()}%",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+
+            Slider(
+                state = waterState,
+                modifier = Modifier.padding(top = 8.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl,
+                thumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl)
+                                MaterialTheme.colorScheme.background
+                            else
+                                MaterialTheme.colorScheme.onBackground,
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.onTertiaryContainer
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.value / 100f)
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                            ) {
+                                Icon(
+                                    imageVector = when (it.value) {
+                                        0f -> Icons.Default.FormatColorReset
+                                        100f -> Icons.Filled.WaterDrop
+                                        else -> Icons.Outlined.WaterDrop
+                                    },
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                        .size(32.dp),
+                                    tint = if (enableControl)
+                                        MaterialTheme.colorScheme.onPrimary
+                                    else
+                                        MaterialTheme.colorScheme.tertiaryContainer
+                                )
+                            }
+
+                            Text(
+                                text = "${it.value.toInt()}%",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+        }
+
+
+        Text(
+            text = "管理员警报设置",
+            modifier = Modifier.padding(top = 24.dp, start = 12.dp, end = 12.dp, bottom = 6.dp),
+            fontSize = 16.sp,
+            color = if (enableControl)
+                MaterialTheme.colorScheme.inversePrimary
+            else
+                MaterialTheme.colorScheme.onTertiary,
+            fontWeight = FontWeight.Medium,
+            fontFamily = font
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.cardColors(
+                containerColor = if (enableControl)
+                    MaterialTheme.colorScheme.primaryContainer
+                else
+                    MaterialTheme.colorScheme.tertiaryContainer
+            )
+        ) {
+            val airTemperatureState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.alarm.administer.air.temperature.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.alarm.administer.air.temperature.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            airTemperatureState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.alarm.administer.air.temperature.lower set airTemperatureState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.alarm.administer.air.temperature.upper set airTemperatureState.activeRangeEnd.toInt()
+            }
+
+            val airHumidityState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.alarm.administer.air.humidity.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.alarm.administer.air.humidity.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            airHumidityState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.alarm.administer.air.humidity.lower set airHumidityState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.alarm.administer.air.humidity.upper set airHumidityState.activeRangeEnd.toInt()
+            }
+
+            val soilTemperatureState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.alarm.administer.soil.temperature.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.alarm.administer.soil.temperature.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            soilTemperatureState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.alarm.administer.soil.temperature.lower set soilTemperatureState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.alarm.administer.soil.temperature.upper set soilTemperatureState.activeRangeEnd.toInt()
+            }
+
+            val soilHumidityState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.alarm.administer.soil.humidity.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.alarm.administer.soil.humidity.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            soilHumidityState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.alarm.administer.soil.humidity.lower set soilHumidityState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.alarm.administer.soil.humidity.upper set soilHumidityState.activeRangeEnd.toInt()
+            }
+
+            Text(
+                text = "空气温度区间",
+                modifier = Modifier.padding(top = 16.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = airTemperatureState,
+                modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+
+            Text(
+                text = "空气湿度区间",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = airHumidityState,
+                modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+
+            Text(
+                text = "土壤温度区间",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = soilTemperatureState,
+                modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+
+            Text(
+                text = "土壤湿度区间",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = soilHumidityState,
+                modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+        }
+
+        Text(
+            text = "管理员提醒设置",
+            modifier = Modifier.padding(top = 24.dp, start = 12.dp, end = 12.dp, bottom = 6.dp),
+            fontSize = 16.sp,
+            color = if (enableControl)
+                MaterialTheme.colorScheme.inversePrimary
+            else
+                MaterialTheme.colorScheme.onTertiary,
+            fontWeight = FontWeight.Medium,
+            fontFamily = font
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.cardColors(
+                containerColor = if (enableControl)
+                    MaterialTheme.colorScheme.primaryContainer
+                else
+                    MaterialTheme.colorScheme.tertiaryContainer
+            )
+        ) {
+            val airTemperatureState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.warning.administer.air.temperature.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.warning.administer.air.temperature.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            airTemperatureState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.warning.administer.air.temperature.lower set airTemperatureState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.warning.administer.air.temperature.upper set airTemperatureState.activeRangeEnd.toInt()
+            }
+
+            val airHumidityState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.warning.administer.air.humidity.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.warning.administer.air.humidity.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            airHumidityState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.warning.administer.air.humidity.lower set airHumidityState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.warning.administer.air.humidity.upper set airHumidityState.activeRangeEnd.toInt()
+            }
+
+            val soilTemperatureState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.warning.administer.soil.temperature.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.warning.administer.soil.temperature.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            soilTemperatureState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.warning.administer.soil.temperature.lower set soilTemperatureState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.warning.administer.soil.temperature.upper set soilTemperatureState.activeRangeEnd.toInt()
+            }
+
+            val soilHumidityState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.warning.administer.soil.humidity.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.warning.administer.soil.humidity.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            soilHumidityState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.warning.administer.soil.humidity.lower set soilHumidityState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.warning.administer.soil.humidity.upper set soilHumidityState.activeRangeEnd.toInt()
+            }
+
+            Text(
+                text = "空气温度区间",
+                modifier = Modifier.padding(top = 16.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = airTemperatureState,
+                modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+
+            Text(
+                text = "空气湿度区间",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = airHumidityState,
+                modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+
+            Text(
+                text = "土壤温度区间",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = soilTemperatureState,
+                modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+
+            Text(
+                text = "土壤湿度区间",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = soilHumidityState,
+                modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+        }
+
+        Text(
+            text = "AI警报介入设置",
+            modifier = Modifier.padding(top = 24.dp, start = 12.dp, end = 12.dp, bottom = 6.dp),
+            fontSize = 16.sp,
+            color = if (enableControl and enableAIOperateWhenAlarm)
+                MaterialTheme.colorScheme.inversePrimary
+            else
+                MaterialTheme.colorScheme.onTertiary,
+            fontWeight = FontWeight.Medium,
+            fontFamily = font
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.cardColors(
+                containerColor = if (enableControl and enableAIOperateWhenAlarm)
+                    MaterialTheme.colorScheme.primaryContainer
+                else
+                    MaterialTheme.colorScheme.tertiaryContainer
+            )
+        ) {
+            val airTemperatureState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.alarm.ai.air.temperature.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.alarm.ai.air.temperature.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            airTemperatureState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.alarm.ai.air.temperature.lower set airTemperatureState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.alarm.ai.air.temperature.upper set airTemperatureState.activeRangeEnd.toInt()
+            }
+
+            val airHumidityState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.alarm.ai.air.humidity.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.alarm.ai.air.humidity.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            airHumidityState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.alarm.ai.air.humidity.lower set airHumidityState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.alarm.ai.air.humidity.upper set airHumidityState.activeRangeEnd.toInt()
+            }
+
+            val soilTemperatureState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.alarm.ai.soil.temperature.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.alarm.ai.soil.temperature.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            soilTemperatureState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.alarm.ai.soil.temperature.lower set soilTemperatureState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.alarm.ai.soil.temperature.upper set soilTemperatureState.activeRangeEnd.toInt()
+            }
+
+            val soilHumidityState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.alarm.ai.soil.humidity.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.alarm.ai.soil.humidity.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            soilHumidityState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.alarm.ai.soil.humidity.lower set soilHumidityState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.alarm.ai.soil.humidity.upper set soilHumidityState.activeRangeEnd.toInt()
+            }
+
+            Text(
+                text = "空气温度区间",
+                modifier = Modifier.padding(top = 16.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl and enableAIOperateWhenAlarm)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = airTemperatureState,
+                modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl and enableAIOperateWhenAlarm,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl and enableAIOperateWhenAlarm)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenAlarm)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenAlarm)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+
+            Text(
+                text = "空气湿度区间",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl and enableAIOperateWhenAlarm)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = airHumidityState,
+                modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl and enableAIOperateWhenAlarm,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl and enableAIOperateWhenAlarm)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenAlarm)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenAlarm)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+
+            Text(
+                text = "土壤温度区间",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl and enableAIOperateWhenAlarm)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = soilTemperatureState,
+                modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl and enableAIOperateWhenAlarm,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl and enableAIOperateWhenAlarm)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenAlarm)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenAlarm)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+
+            Text(
+                text = "土壤湿度区间",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl and enableAIOperateWhenAlarm)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = soilHumidityState,
+                modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl and enableAIOperateWhenAlarm,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl and enableAIOperateWhenAlarm)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenAlarm)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenAlarm)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+        }
+
+        Text(
+            text = "AI提醒介入设置",
+            modifier = Modifier.padding(top = 24.dp, start = 12.dp, end = 12.dp, bottom = 6.dp),
+            fontSize = 16.sp,
+            color = if (enableControl and enableAIOperateWhenWarning)
+                MaterialTheme.colorScheme.inversePrimary
+            else
+                MaterialTheme.colorScheme.onTertiary,
+            fontWeight = FontWeight.Medium,
+            fontFamily = font
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.cardColors(
+                containerColor = if (enableControl and enableAIOperateWhenWarning)
+                    MaterialTheme.colorScheme.primaryContainer
+                else
+                    MaterialTheme.colorScheme.tertiaryContainer
+            )
+        ) {
+            val airTemperatureState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.warning.ai.air.temperature.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.warning.ai.air.temperature.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            airTemperatureState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.warning.ai.air.temperature.lower set airTemperatureState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.warning.ai.air.temperature.upper set airTemperatureState.activeRangeEnd.toInt()
+            }
+
+            val airHumidityState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.warning.ai.air.humidity.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.warning.ai.air.humidity.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            airHumidityState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.warning.ai.air.humidity.lower set airHumidityState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.warning.ai.air.humidity.upper set airHumidityState.activeRangeEnd.toInt()
+            }
+
+            val soilTemperatureState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.warning.ai.soil.temperature.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.warning.ai.soil.temperature.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            soilTemperatureState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.warning.ai.soil.temperature.lower set soilTemperatureState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.warning.ai.soil.temperature.upper set soilTemperatureState.activeRangeEnd.toInt()
+            }
+
+            val soilHumidityState = remember {
+                RangeSliderState(
+                    activeRangeStart = ui.settings.machine.running.limit.warning.ai.soil.humidity.lower.current.value.toFloat(),
+                    activeRangeEnd = ui.settings.machine.running.limit.warning.ai.soil.humidity.upper.current.value.toFloat(),
+                    onValueChangeFinished = {},
+                    valueRange = 0f..100f,
+                )
+            }
+            soilHumidityState.onValueChangeFinished = {
+                ui.settings.machine.running.limit.warning.ai.soil.humidity.lower set soilHumidityState.activeRangeStart.toInt()
+                ui.settings.machine.running.limit.warning.ai.soil.humidity.upper set soilHumidityState.activeRangeEnd.toInt()
+            }
+
+            Text(
+                text = "空气温度区间",
+                modifier = Modifier.padding(top = 16.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl and enableAIOperateWhenWarning)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = airTemperatureState,
+                modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl and enableAIOperateWhenWarning,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl and enableAIOperateWhenWarning)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenWarning)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenWarning)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenWarning)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenWarning)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+
+            Text(
+                text = "空气湿度区间",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl and enableAIOperateWhenWarning)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = airHumidityState,
+                modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl and enableAIOperateWhenWarning,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl and enableAIOperateWhenWarning)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenWarning)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenWarning)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenWarning)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenWarning)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+
+            Text(
+                text = "土壤温度区间",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl and enableAIOperateWhenWarning)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = soilTemperatureState,
+                modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl and enableAIOperateWhenWarning,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl and enableAIOperateWhenWarning)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenWarning)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenWarning)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenWarning)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}℃",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenWarning)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+
+            Text(
+                text = "土壤湿度区间",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableControl and enableAIOperateWhenWarning)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            RangeSlider(
+                state = soilHumidityState,
+                modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                enabled = enableControl and enableAIOperateWhenWarning,
+                startThumb = {},
+                endThumb = {},
+                track = {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (enableControl and enableAIOperateWhenWarning)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenWarning)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterStart)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(it.activeRangeStart / 100f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (enableControl and enableAIOperateWhenWarning)
+                                            MaterialTheme.colorScheme.background
+                                        else
+                                            MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    .align(Alignment.CenterEnd)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(1f - it.activeRangeEnd / 100f)
+                            )
+
+                            Text(
+                                text = "${it.activeRangeStart.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenWarning)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                            Text(
+                                text = "${it.activeRangeEnd.roundToInt()}%RH",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(horizontal = 8.dp),
+                                fontSize = 20.sp,
+                                color = if (enableControl and enableAIOperateWhenWarning)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = font
+                            )
+                        }
+                    }
+                }
+            )
+        }
+    }
 }
