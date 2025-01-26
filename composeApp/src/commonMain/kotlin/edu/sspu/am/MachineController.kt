@@ -3,7 +3,10 @@ package edu.sspu.am
 import KottieAnimation
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,10 +15,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
@@ -44,6 +49,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.RangeSliderState
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderState
 import androidx.compose.material3.Text
@@ -61,6 +67,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
@@ -87,6 +95,24 @@ fun MachineController(
 
     val isRefreshing by ui.settings.machine.refreshing.enable.collectAsState()
     val pullToRefreshState = rememberPullToRefreshState()
+
+    val floatingMachineBaseInfoCardState = remember { mutableStateOf(false) }
+    val floatingMachineConnectionInfoCardState = remember { mutableStateOf(false) }
+    val floatingMachineCoreVersionInfoCardState = remember { mutableStateOf(false) }
+    val floatingMachineControlCardState = remember { mutableStateOf(false) }
+    val floatingMachineAlarmToAdministerSettingCardState = remember { mutableStateOf(false) }
+    val floatingMachineWarningToAdministerSettingCardState = remember { mutableStateOf(false) }
+    val floatingMachineAlarmToAISettingCardState = remember { mutableStateOf(false) }
+    val floatingMachineWarningToAISettingCardState = remember { mutableStateOf(false) }
+
+    val floatingMachineBaseInfoCard by floatingMachineBaseInfoCardState
+    val floatingMachineConnectionInfoCard by floatingMachineConnectionInfoCardState
+    val floatingMachineCoreVersionInfoCard by floatingMachineCoreVersionInfoCardState
+    val floatingMachineControlCard by floatingMachineControlCardState
+    val floatingMachineAlarmToAdministerSettingCard by floatingMachineAlarmToAdministerSettingCardState
+    val floatingMachineWarningToAdministerSettingCard by floatingMachineWarningToAdministerSettingCardState
+    val floatingMachineAlarmToAISettingCard by floatingMachineAlarmToAISettingCardState
+    val floatingMachineWarningToAISettingCard by floatingMachineWarningToAISettingCardState
 
     var enableControl = remember { mutableStateOf(true) }
 
@@ -153,79 +179,244 @@ fun MachineController(
             }
         }
     ) {
-        if (machine != null) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
-                item {
-                    MachineBaseInfoCard(
-                        ui = ui,
-                        modifier = Modifier.fillMaxWidth(),
-                        machine = machine
-                    )
+        var halfHeight by remember { mutableStateOf(0) }
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+                .onGloballyPositioned { halfHeight = it.size.height / 3 },
+            topBar = {
+                if (
+                    setOf(
+                        floatingMachineBaseInfoCard,
+                        floatingMachineConnectionInfoCard,
+                        floatingMachineCoreVersionInfoCard,
+                        floatingMachineControlCard,
+                        floatingMachineAlarmToAdministerSettingCard,
+                        floatingMachineWarningToAdministerSettingCard,
+                        floatingMachineAlarmToAISettingCard,
+                        floatingMachineWarningToAISettingCard
+                    ).any { it }
+                ) {
+                    if (machine != null) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(bottom = 24.dp),
+                            shape = RoundedCornerShape(
+                                topStart = 0.dp,
+                                topEnd = 0.dp,
+                                bottomStart = 30.dp,
+                                bottomEnd = 30.dp
+                            ),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer
+                            )
+                        ) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = with(LocalDensity.current) { halfHeight.toDp() }),
+                                verticalArrangement = Arrangement.spacedBy(24.dp)
+                            ) {
+                                if (floatingMachineBaseInfoCard) {
+                                    item {
+                                        MachineBaseInfoCard(
+                                            ui = ui,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            machine = machine,
+                                            floatingState = floatingMachineBaseInfoCardState
+                                        )
+                                    }
+                                }
+
+                                if (floatingMachineConnectionInfoCard) {
+                                    item {
+                                        MachineConnectionInfoCard(
+                                            ui = ui,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            url = machine.url,
+                                            floatingState = floatingMachineConnectionInfoCardState
+                                        )
+                                    }
+                                }
+
+                                if (machine.url != null) {
+                                    if (floatingMachineCoreVersionInfoCard) {
+                                        item {
+                                            MachineCoreVersionInfoCard(
+                                                ui = ui,
+                                                modifier = Modifier.fillMaxWidth(),
+                                                url = machine.url,
+                                                floatingState = floatingMachineCoreVersionInfoCardState
+                                            )
+                                        }
+                                    }
+
+                                    if (floatingMachineControlCard) {
+                                        item {
+                                            MachineControlCard(
+                                                ui = ui,
+                                                modifier = Modifier.fillMaxWidth(),
+                                                url = machine.url,
+                                                enable = enableControl,
+                                                floatingState = floatingMachineControlCardState
+                                            )
+                                        }
+                                    }
+
+                                    if (floatingMachineAlarmToAdministerSettingCard) {
+                                        item {
+                                            MachineAlarmToAdministerSettingCard(
+                                                ui = ui,
+                                                modifier = Modifier.fillMaxWidth(),
+                                                url = machine.url,
+                                                enable = enableControl,
+                                                floatingState = floatingMachineAlarmToAdministerSettingCardState
+                                            )
+                                        }
+                                    }
+
+                                    if (floatingMachineWarningToAdministerSettingCard) {
+                                        item {
+                                            MachineWarningToAdministerSettingCard(
+                                                ui = ui,
+                                                modifier = Modifier.fillMaxWidth(),
+                                                url = machine.url,
+                                                enable = enableControl,
+                                                floatingState = floatingMachineWarningToAdministerSettingCardState
+                                            )
+                                        }
+                                    }
+
+                                    if (floatingMachineAlarmToAISettingCard) {
+                                        item {
+                                            MachineAlarmToAISettingCard(
+                                                ui = ui,
+                                                modifier = Modifier.fillMaxWidth(),
+                                                url = machine.url,
+                                                enable = enableControl,
+                                                floatingState = floatingMachineAlarmToAISettingCardState
+                                            )
+                                        }
+                                    }
+
+                                    if (floatingMachineWarningToAISettingCard) {
+                                        item {
+                                            MachineWarningToAISettingCard(
+                                                ui = ui,
+                                                modifier = Modifier.fillMaxWidth(),
+                                                url = machine.url,
+                                                enable = enableControl,
+                                                floatingState = floatingMachineWarningToAISettingCardState
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-
-                item {
-                    MachineConnectionInfoCard(
-                        ui = ui,
-                        modifier = Modifier.fillMaxWidth(),
-                        url = machine.url
-                    )
-                }
-
-                if (machine.url != null) {
-                    item {
-                        MachineCoreVersionInfoCard(
-                            ui = ui,
-                            modifier = Modifier.fillMaxWidth(),
-                            url = machine.url
-                        )
+            }
+        ) {
+            if (machine != null) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = it.calculateTopPadding()),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    if (!floatingMachineBaseInfoCard) {
+                        item {
+                            MachineBaseInfoCard(
+                                ui = ui,
+                                modifier = Modifier.fillMaxWidth(),
+                                machine = machine,
+                                floatingState = floatingMachineBaseInfoCardState
+                            )
+                        }
                     }
 
-                    item {
-                        MachineControlCard(
-                            ui = ui,
-                            modifier = Modifier.fillMaxWidth(),
-                            url = machine.url,
-                            enable = enableControl
-                        )
+                    if (!floatingMachineConnectionInfoCard) {
+                        item {
+                            MachineConnectionInfoCard(
+                                ui = ui,
+                                modifier = Modifier.fillMaxWidth(),
+                                url = machine.url,
+                                floatingState = floatingMachineConnectionInfoCardState
+                            )
+                        }
                     }
 
-                    item {
-                        MachineAlarmToAdministerSettingCard(
-                            ui = ui,
-                            modifier = Modifier.fillMaxWidth(),
-                            url = machine.url,
-                            enable = enableControl
-                        )
-                    }
+                    if (machine.url != null) {
+                        if (!floatingMachineCoreVersionInfoCard) {
+                            item {
+                                MachineCoreVersionInfoCard(
+                                    ui = ui,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    url = machine.url,
+                                    floatingState = floatingMachineCoreVersionInfoCardState
+                                )
+                            }
+                        }
 
-                    item {
-                        MachineWarningToAdministerSettingCard(
-                            ui = ui,
-                            modifier = Modifier.fillMaxWidth(),
-                            url = machine.url,
-                            enable = enableControl
-                        )
-                    }
+                        if (!floatingMachineControlCard) {
+                            item {
+                                MachineControlCard(
+                                    ui = ui,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    url = machine.url,
+                                    enable = enableControl,
+                                    floatingState = floatingMachineControlCardState
+                                )
+                            }
+                        }
 
-                    item {
-                        MachineAlarmToAISettingCard(
-                            ui = ui,
-                            modifier = Modifier.fillMaxWidth(),
-                            url = machine.url,
-                            enable = enableControl
-                        )
-                    }
+                        if (!floatingMachineAlarmToAdministerSettingCard) {
+                            item {
+                                MachineAlarmToAdministerSettingCard(
+                                    ui = ui,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    url = machine.url,
+                                    enable = enableControl,
+                                    floatingState = floatingMachineAlarmToAdministerSettingCardState
+                                )
+                            }
+                        }
 
-                    item {
-                        MachineWarningToAISettingCard(
-                            ui = ui,
-                            modifier = Modifier.fillMaxWidth(),
-                            url = machine.url,
-                            enable = enableControl
-                        )
+                        if (!floatingMachineWarningToAdministerSettingCard) {
+                            item {
+                                MachineWarningToAdministerSettingCard(
+                                    ui = ui,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    url = machine.url,
+                                    enable = enableControl,
+                                    floatingState = floatingMachineWarningToAdministerSettingCardState
+                                )
+                            }
+                        }
+
+                        if (!floatingMachineAlarmToAISettingCard) {
+                            item {
+                                MachineAlarmToAISettingCard(
+                                    ui = ui,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    url = machine.url,
+                                    enable = enableControl,
+                                    floatingState = floatingMachineAlarmToAISettingCardState
+                                )
+                            }
+                        }
+
+                        if (!floatingMachineWarningToAISettingCard) {
+                            item {
+                                MachineWarningToAISettingCard(
+                                    ui = ui,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    url = machine.url,
+                                    enable = enableControl,
+                                    floatingState = floatingMachineWarningToAISettingCardState
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -233,16 +424,23 @@ fun MachineController(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MachineBaseInfoCard(
     ui: UI,
     modifier: Modifier = Modifier,
-    machine: MachineData
+    machine: MachineData,
+    floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
 
     Card(
-        modifier = modifier,
+        modifier = modifier
+            .combinedClickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onDoubleClick = { floatingState.value = !floatingState.value }
+            ) {},
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -347,11 +545,13 @@ fun MachineBaseInfoCard(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MachineConnectionInfoCard(
     ui: UI,
     modifier: Modifier = Modifier,
-    url: MachineUrl? = null
+    url: MachineUrl? = null,
+    floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
 
@@ -369,7 +569,12 @@ fun MachineConnectionInfoCard(
 //    info = "无法连接到${url?.display ?: "null"}"
 
     Card(
-        modifier = modifier,
+        modifier = modifier
+            .combinedClickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onDoubleClick = { floatingState.value = !floatingState.value }
+            ) {},
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -490,11 +695,13 @@ fun MachineConnectionInfoCard(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MachineCoreVersionInfoCard(
     ui: UI,
     modifier: Modifier = Modifier,
-    url: MachineUrl
+    url: MachineUrl,
+    floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
 
@@ -509,7 +716,12 @@ fun MachineCoreVersionInfoCard(
     }
 
     Card(
-        modifier = modifier,
+        modifier = modifier
+            .combinedClickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onDoubleClick = { floatingState.value = !floatingState.value }
+            ) {},
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -560,13 +772,14 @@ fun MachineCoreVersionInfoCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MachineControlCard(
     ui: UI,
     modifier: Modifier = Modifier,
     url: MachineUrl,
-    enable: MutableState<Boolean> = remember { mutableStateOf(true) }
+    enable: MutableState<Boolean> = remember { mutableStateOf(true) },
+    floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
 
@@ -588,7 +801,13 @@ fun MachineControlCard(
         )
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onDoubleClick = { floatingState.value = !floatingState.value }
+                ) {},
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
                 containerColor = if (enableControl)
@@ -770,13 +989,14 @@ fun MachineControlCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MachineAlarmToAdministerSettingCard(
     ui: UI,
     modifier: Modifier = Modifier,
     url: MachineUrl,
-    enable: MutableState<Boolean> = remember { mutableStateOf(true) }
+    enable: MutableState<Boolean> = remember { mutableStateOf(true) },
+    floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
 
@@ -798,7 +1018,13 @@ fun MachineAlarmToAdministerSettingCard(
         )
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onDoubleClick = { floatingState.value = !floatingState.value }
+                ) {},
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
                 containerColor = if (enableControl)
@@ -1226,13 +1452,14 @@ fun MachineAlarmToAdministerSettingCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MachineWarningToAdministerSettingCard(
     ui: UI,
     modifier: Modifier = Modifier,
     url: MachineUrl,
-    enable: MutableState<Boolean> = remember { mutableStateOf(true) }
+    enable: MutableState<Boolean> = remember { mutableStateOf(true) },
+    floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
 
@@ -1254,7 +1481,13 @@ fun MachineWarningToAdministerSettingCard(
         )
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onDoubleClick = { floatingState.value = !floatingState.value }
+                ) {},
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
                 containerColor = if (enableControl)
@@ -1682,13 +1915,14 @@ fun MachineWarningToAdministerSettingCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MachineAlarmToAISettingCard(
     ui: UI,
     modifier: Modifier = Modifier,
     url: MachineUrl,
-    enable: MutableState<Boolean> = remember { mutableStateOf(true) }
+    enable: MutableState<Boolean> = remember { mutableStateOf(true) },
+    floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
 
@@ -1711,7 +1945,13 @@ fun MachineAlarmToAISettingCard(
         )
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onDoubleClick = { floatingState.value = !floatingState.value }
+                ) {},
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
                 containerColor = if (enableControl and enableAIOperateWhenAlarm)
@@ -2139,13 +2379,14 @@ fun MachineAlarmToAISettingCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MachineWarningToAISettingCard(
     ui: UI,
     modifier: Modifier = Modifier,
     url: MachineUrl,
-    enable: MutableState<Boolean> = remember { mutableStateOf(true) }
+    enable: MutableState<Boolean> = remember { mutableStateOf(true) },
+    floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
 
@@ -2168,7 +2409,13 @@ fun MachineWarningToAISettingCard(
         )
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onDoubleClick = { floatingState.value = !floatingState.value }
+                ) {},
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
                 containerColor = if (enableControl and enableAIOperateWhenWarning)
