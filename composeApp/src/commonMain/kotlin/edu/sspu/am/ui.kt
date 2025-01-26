@@ -1,5 +1,6 @@
 package edu.sspu.am
 
+import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.Icons
@@ -1403,6 +1404,58 @@ class UI : ViewModel() {
 
                         fun decrement() {
                             if (current.value < 100) _current.value--
+                        }
+                    }
+                }
+            }
+
+            val sensor = MachineSensor
+
+            object MachineSensor {
+                val air = MachineAirSensor
+
+                object MachineAirSensor {
+                    val temperature = MachineAirTemperatureData
+
+                    object MachineAirTemperatureData {
+                        private val _current = MutableStateFlow(0f)
+                        val current = _current.asStateFlow()
+                        infix fun set(@FloatRange(from = -273.15, to = 100.0) value: Float) {
+                            _current.value = value
+                        }
+                    }
+
+                    val humidity = MachineAirHumidityData
+
+                    object MachineAirHumidityData {
+                        private val _current = MutableStateFlow(0f)
+                        val current = _current.asStateFlow()
+                        infix fun set(@FloatRange(from = 0.0, to = 100.0) value: Float) {
+                            _current.value = value
+                        }
+                    }
+                }
+
+                val soil = MachineSoilSensor
+
+                object MachineSoilSensor {
+                    val temperature = MachineSoilTemperatureData
+
+                    object MachineSoilTemperatureData {
+                        private val _current = MutableStateFlow(0f)
+                        val current = _current.asStateFlow()
+                        infix fun set(@FloatRange(from = -273.15, to = 100.0) value: Float) {
+                            _current.value = value
+                        }
+                    }
+
+                    val humidity = MachineSoilHumidityData
+
+                    object MachineSoilHumidityData {
+                        private val _current = MutableStateFlow(0f)
+                        val current = _current.asStateFlow()
+                        infix fun set(@FloatRange(from = 0.0, to = 100.0) value: Float) {
+                            _current.value = value
                         }
                     }
                 }
