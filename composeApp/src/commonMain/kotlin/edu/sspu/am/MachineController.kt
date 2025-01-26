@@ -981,7 +981,7 @@ fun MachineSensorDataCard(
                         text = when {
                             airTemperature < 0f -> "超出下限"
                             airTemperature > 100f -> "超出上限"
-                            else -> "${(airTemperature * 100f).roundToInt() / 100f}℃"
+                            else -> "${(airTemperature * 100f).roundToInt() / 100.0}℃"
                         },
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
@@ -1079,7 +1079,7 @@ fun MachineSensorDataCard(
                         text = when {
                             airHumidity < 0f -> "超出下限"
                             airHumidity > 100f -> "超出上限"
-                            else -> "${(airHumidity * 100f).roundToInt() / 100f}%RH"
+                            else -> "${(airHumidity * 100f).roundToInt() / 100.0}%RH"
                         },
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
@@ -1177,7 +1177,7 @@ fun MachineSensorDataCard(
                         text = when {
                             soilTemperature < 0f -> "超出下限"
                             soilTemperature > 100f -> "超出上限"
-                            else -> "${(soilTemperature * 100f).roundToInt() / 100f}℃"
+                            else -> "${(soilTemperature * 100f).roundToInt() / 100.0}℃"
                         },
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
@@ -1275,7 +1275,7 @@ fun MachineSensorDataCard(
                         text = when {
                             soilHumidity < 0f -> "超出下限"
                             soilHumidity > 100f -> "超出上限"
-                            else -> "${(soilHumidity * 100f).roundToInt() / 100f}%RH"
+                            else -> "${(soilHumidity * 100).roundToInt() / 100.0}%RH"
                         },
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
