@@ -44,6 +44,73 @@ fun main() {
     ui.settings.developerMode.on()
     ui.settings.developerMode.fastJumper.one.target set "@app.Settings.other.DeveloperMode"
 
+    // TODO: 正式上线时删除这部分
+    ui.data.list.append(
+        MachineCategory(
+            name = "默认",
+//                icon = MachineCategoryIcon.Heart,
+            machines = listOf(
+                MachineData(
+                    type = MachineType.Blank,
+                    name = "测试机1",
+                    url = MachineUrl.Blank
+                ),
+                MachineData(
+                    type = MachineType.Local,
+                    name = "测试机2",
+                    url = MachineUrl.Local(host = "127.0.0.1", port = 8080)
+                ),
+                MachineData(
+                    type = MachineType.Cloud,
+                    name = "测试机3",
+                    url = MachineUrl.Cloud(
+                        server = "am.sspu.edu.cn",
+                        id = "test-java-pack-aabb-1234"
+                    )
+                ),
+                MachineData(
+                    type = MachineType.Remote,
+                    name = "测试机4",
+                    url = MachineUrl.Remote(
+                        local = MachineUrl.Local(host = "127.0.0.2", port = 8080),
+                        cloud = MachineUrl.Cloud(
+                            server = "am.sspu.edu.cn",
+                            id = "test-java-pack-aabb-1235"
+                        )
+                    )
+                ),
+                MachineData(
+                    type = MachineType.Virtual,
+                    name = "测试机5",
+                    url = MachineUrl.Virtual
+                ),
+                MachineData(
+                    type = MachineType.Virtual,
+                    name = "测试机AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    url = MachineUrl.Virtual
+                ),
+                MachineData(
+                    type = MachineType.Template,
+                    name = "测试模板",
+                    url = MachineUrl.Template(
+                        server = "am.sspu.edu.cn",
+                        id = "test-java-pack-aabb-0000",
+                        author = "RustGod"
+                    )
+                ),
+                MachineData(
+                    type = MachineType.Group,
+                    name = "测试组",
+                    url = MachineUrl.Group(
+                        server = "am.sspu.edu.cn",
+                        id = "test-java-pack-aabb-6666",
+                    )
+                )
+            )
+        )
+    )
+
+
     ComposeViewport(document.body!!) {
         ui.initUI()
         val theme by ui.settings.theme.current.collectAsState()
