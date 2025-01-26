@@ -2,6 +2,7 @@ package edu.sspu.am
 
 import KottieAnimation
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -25,6 +26,7 @@ import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.DeviceThermostat
 import androidx.compose.material.icons.filled.FormatColorReset
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.ModeFanOff
@@ -47,6 +49,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.RangeSliderState
 import androidx.compose.material3.Scaffold
@@ -99,6 +102,7 @@ fun MachineController(
     val floatingMachineBaseInfoCardState = remember { mutableStateOf(false) }
     val floatingMachineConnectionInfoCardState = remember { mutableStateOf(false) }
     val floatingMachineCoreVersionInfoCardState = remember { mutableStateOf(false) }
+    val floatingMachineSensorDataCardState = remember { mutableStateOf(false) }
     val floatingMachineControlCardState = remember { mutableStateOf(false) }
     val floatingMachineAlarmToAdministerSettingCardState = remember { mutableStateOf(false) }
     val floatingMachineWarningToAdministerSettingCardState = remember { mutableStateOf(false) }
@@ -108,6 +112,7 @@ fun MachineController(
     val floatingMachineBaseInfoCard by floatingMachineBaseInfoCardState
     val floatingMachineConnectionInfoCard by floatingMachineConnectionInfoCardState
     val floatingMachineCoreVersionInfoCard by floatingMachineCoreVersionInfoCardState
+    val floatingMachineSensorDataCard by floatingMachineSensorDataCardState
     val floatingMachineControlCard by floatingMachineControlCardState
     val floatingMachineAlarmToAdministerSettingCard by floatingMachineAlarmToAdministerSettingCardState
     val floatingMachineWarningToAdministerSettingCard by floatingMachineWarningToAdministerSettingCardState
@@ -115,6 +120,7 @@ fun MachineController(
     val floatingMachineWarningToAISettingCard by floatingMachineWarningToAISettingCardState
 
     var enableControl = remember { mutableStateOf(true) }
+    var enableGetData = remember { mutableStateOf(true) }
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
@@ -123,6 +129,10 @@ fun MachineController(
             ui.scope.launch {
                 delay(3000)
                 ui.settings.machine.refreshing.off()
+                ui.settings.machine.sensor.air.temperature set 33.33f
+                ui.settings.machine.sensor.air.humidity set 45.5f
+                ui.settings.machine.sensor.soil.temperature set 101f
+                ui.settings.machine.sensor.soil.humidity set -1f
             }
         },
         modifier = modifier,
@@ -190,6 +200,7 @@ fun MachineController(
                         floatingMachineBaseInfoCard,
                         floatingMachineConnectionInfoCard,
                         floatingMachineCoreVersionInfoCard,
+                        floatingMachineSensorDataCard,
                         floatingMachineControlCard,
                         floatingMachineAlarmToAdministerSettingCard,
                         floatingMachineWarningToAdministerSettingCard,
@@ -247,6 +258,18 @@ fun MachineController(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 url = machine.url,
                                                 floatingState = floatingMachineCoreVersionInfoCardState
+                                            )
+                                        }
+                                    }
+
+                                    if (floatingMachineSensorDataCard) {
+                                        item {
+                                            MachineSensorDataCard(
+                                                ui = ui,
+                                                modifier = Modifier.fillMaxWidth(),
+                                                url = machine.url,
+                                                enable = enableGetData,
+                                                floatingState = floatingMachineSensorDataCardState
                                             )
                                         }
                                     }
@@ -354,6 +377,18 @@ fun MachineController(
                                     modifier = Modifier.fillMaxWidth(),
                                     url = machine.url,
                                     floatingState = floatingMachineCoreVersionInfoCardState
+                                )
+                            }
+                        }
+
+                        if (!floatingMachineSensorDataCard) {
+                            item {
+                                MachineSensorDataCard(
+                                    ui = ui,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    url = machine.url,
+                                    enable = enableGetData,
+                                    floatingState = floatingMachineSensorDataCardState
                                 )
                             }
                         }
@@ -767,6 +802,499 @@ fun MachineCoreVersionInfoCard(
                     fontWeight = FontWeight.Black,
                     fontFamily = font
                 )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun MachineSensorDataCard(
+    ui: UI,
+    modifier: Modifier = Modifier,
+    url: MachineUrl,
+    enable: MutableState<Boolean> = remember { mutableStateOf(true) },
+    floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
+) {
+    val font by ui.font.collectAsState()
+
+    val enableGetData by enable
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text = "传感器数据",
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp),
+            fontSize = 16.sp,
+            color = if (enableGetData)
+                MaterialTheme.colorScheme.inversePrimary
+            else
+                MaterialTheme.colorScheme.onTertiary,
+            fontWeight = FontWeight.Medium,
+            fontFamily = font
+        )
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onDoubleClick = { floatingState.value = !floatingState.value }
+                ) {},
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.cardColors(
+                containerColor = if (enableGetData)
+                    MaterialTheme.colorScheme.primaryContainer
+                else
+                    MaterialTheme.colorScheme.tertiaryContainer
+            )
+        ) {
+            val airTemperatureAlarmLower by ui.settings.machine.running.limit.alarm.administer.air.temperature.lower.current.collectAsState()
+            val airTemperatureAlarmUpper by ui.settings.machine.running.limit.alarm.administer.air.temperature.upper.current.collectAsState()
+            val airTemperatureWarningLower by ui.settings.machine.running.limit.warning.administer.air.temperature.lower.current.collectAsState()
+            val airTemperatureWarningUpper by ui.settings.machine.running.limit.warning.administer.air.temperature.upper.current.collectAsState()
+            val airHumidityAlarmLower by ui.settings.machine.running.limit.alarm.administer.air.humidity.lower.current.collectAsState()
+            val airHumidityAlarmUpper by ui.settings.machine.running.limit.alarm.administer.air.humidity.upper.current.collectAsState()
+            val airHumidityWarningLower by ui.settings.machine.running.limit.warning.administer.air.humidity.lower.current.collectAsState()
+            val airHumidityWarningUpper by ui.settings.machine.running.limit.warning.administer.air.humidity.upper.current.collectAsState()
+            val soilTemperatureAlarmLower by ui.settings.machine.running.limit.alarm.administer.soil.temperature.lower.current.collectAsState()
+            val soilTemperatureAlarmUpper by ui.settings.machine.running.limit.alarm.administer.soil.temperature.upper.current.collectAsState()
+            val soilTemperatureWarningLower by ui.settings.machine.running.limit.warning.administer.soil.temperature.lower.current.collectAsState()
+            val soilTemperatureWarningUpper by ui.settings.machine.running.limit.warning.administer.soil.temperature.upper.current.collectAsState()
+            val soilHumidityAlarmLower by ui.settings.machine.running.limit.alarm.administer.soil.humidity.lower.current.collectAsState()
+            val soilHumidityAlarmUpper by ui.settings.machine.running.limit.alarm.administer.soil.humidity.upper.current.collectAsState()
+            val soilHumidityWarningLower by ui.settings.machine.running.limit.warning.administer.soil.humidity.lower.current.collectAsState()
+            val soilHumidityWarningUpper by ui.settings.machine.running.limit.warning.administer.soil.humidity.upper.current.collectAsState()
+
+            val airTemperature by ui.settings.machine.sensor.air.temperature.current.collectAsState()
+            val airHumidity by ui.settings.machine.sensor.air.humidity.current.collectAsState()
+            val soilTemperature by ui.settings.machine.sensor.soil.temperature.current.collectAsState()
+            val soilHumidity by ui.settings.machine.sensor.soil.humidity.current.collectAsState()
+
+            val airTemperatureProgress by animateFloatAsState(
+                targetValue = when {
+                    airTemperature < 0f -> -0.001f
+                    airTemperature > 100f -> 100.001f
+                    else -> airTemperature
+                },
+                animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+            )
+            val airHumidityProgress by animateFloatAsState(
+                targetValue = when {
+                    airHumidity < 0f -> -0.001f
+                    airHumidity > 100f -> 100.001f
+                    else -> airHumidity
+                },
+                animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+            )
+            val soilTemperatureProgress by animateFloatAsState(
+                targetValue = when {
+                    soilTemperature < 0f -> -0.001f
+                    soilTemperature > 100f -> 100.001f
+                    else -> soilTemperature
+                },
+                animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+            )
+            val soilHumidityProgress by animateFloatAsState(
+                targetValue = when {
+                    soilHumidity < 0f -> -0.001f
+                    soilHumidity > 100f -> 100.001f
+                    else -> soilHumidity
+                },
+                animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+            )
+
+            Text(
+                text = "空气温度",
+                modifier = Modifier.padding(top = 16.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableGetData)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            Card(
+                modifier = Modifier
+                    .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
+                    .fillMaxWidth()
+                    .height(64.dp),
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(
+                    containerColor = if (enableGetData)
+                        MaterialTheme.colorScheme.background
+                    else
+                        MaterialTheme.colorScheme.onBackground,
+                )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                if (enableGetData)
+                                    when {
+                                        airTemperatureProgress < airTemperatureAlarmLower -> Color(0xFFCCA4E3)
+                                        airTemperatureProgress > airTemperatureAlarmUpper -> Color(0xFFf47983)
+                                        airTemperatureProgress < airTemperatureWarningLower -> Color(0xFF70F3FF)
+                                        airTemperatureProgress > airTemperatureWarningUpper -> Color(0xFFFFA400)
+                                        else -> MaterialTheme.colorScheme.primary
+                                    }
+                                else
+                                    MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                            .align(Alignment.CenterStart)
+                            .fillMaxHeight()
+                            .fillMaxWidth(airTemperatureProgress / 100f)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(horizontal = 8.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.DeviceThermostat,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(32.dp),
+                            tint = if (enableGetData)
+                                when {
+                                    airTemperatureProgress < airTemperatureAlarmLower -> Color(0xFF801DAE)
+                                    airTemperatureProgress > airTemperatureAlarmUpper -> Color(0xFFF00056)
+                                    airTemperatureProgress < airTemperatureWarningLower -> Color(0xFF44CEF6)
+                                    airTemperatureProgress > airTemperatureWarningUpper -> Color(0xFFFF7500)
+                                    else -> MaterialTheme.colorScheme.onPrimary
+                                }
+                            else
+                                MaterialTheme.colorScheme.tertiaryContainer
+                        )
+                    }
+
+                    Text(
+                        text = when {
+                            airTemperature < 0f -> "超出下限"
+                            airTemperature > 100f -> "超出上限"
+                            else -> "${(airTemperature * 100f).roundToInt() / 100f}℃"
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(horizontal = 8.dp),
+                        fontSize = 20.sp,
+                        color = if (enableGetData)
+                            when {
+                                airTemperatureProgress < airTemperatureAlarmLower -> Color(0xFF801DAE)
+                                airTemperatureProgress > airTemperatureAlarmUpper -> Color(0xFFF00056)
+                                airTemperatureProgress < airTemperatureWarningLower -> Color(0xFF44CEF6)
+                                airTemperatureProgress > airTemperatureWarningUpper -> Color(0xFFFF7500)
+                                else -> MaterialTheme.colorScheme.onPrimary
+                            }
+                        else
+                            MaterialTheme.colorScheme.tertiaryContainer,
+                        fontWeight = FontWeight.Black,
+                        fontFamily = font
+                    )
+                }
+            }
+
+            Text(
+                text = "空气湿度",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableGetData)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            Card(
+                modifier = Modifier
+                    .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
+                    .fillMaxWidth()
+                    .height(64.dp),
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(
+                    containerColor = if (enableGetData)
+                        MaterialTheme.colorScheme.background
+                    else
+                        MaterialTheme.colorScheme.onBackground,
+                )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                if (enableGetData)
+                                    when {
+                                        airHumidityProgress < airHumidityAlarmLower -> Color(0xFFCCA4E3)
+                                        airHumidityProgress > airHumidityAlarmUpper -> Color(0xFFf47983)
+                                        airHumidityProgress < airHumidityWarningLower -> Color(0xFF70F3FF)
+                                        airHumidityProgress > airHumidityWarningUpper -> Color(0xFFFFA400)
+                                        else -> MaterialTheme.colorScheme.primary
+                                    }
+                                else
+                                    MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                            .align(Alignment.CenterStart)
+                            .fillMaxHeight()
+                            .fillMaxWidth(airHumidityProgress / 100f)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(horizontal = 8.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.WaterDrop,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(32.dp),
+                            tint = if (enableGetData)
+                                when {
+                                    airHumidityProgress < airHumidityAlarmLower -> Color(0xFF801DAE)
+                                    airHumidityProgress > airHumidityAlarmUpper -> Color(0xFFF00056)
+                                    airHumidityProgress < airHumidityWarningLower -> Color(0xFF44CEF6)
+                                    airHumidityProgress > airHumidityWarningUpper -> Color(0xFFFF7500)
+                                    else -> MaterialTheme.colorScheme.onPrimary
+                                }
+                            else
+                                MaterialTheme.colorScheme.tertiaryContainer
+                        )
+                    }
+
+                    Text(
+                        text = when {
+                            airHumidity < 0f -> "超出下限"
+                            airHumidity > 100f -> "超出上限"
+                            else -> "${(airHumidity * 100f).roundToInt() / 100f}%RH"
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(horizontal = 8.dp),
+                        fontSize = 20.sp,
+                        color = if (enableGetData)
+                            when {
+                                airHumidityProgress < airHumidityAlarmLower -> Color(0xFF801DAE)
+                                airHumidityProgress > airHumidityAlarmUpper -> Color(0xFFF00056)
+                                airHumidityProgress < airHumidityWarningLower -> Color(0xFF44CEF6)
+                                airHumidityProgress > airHumidityWarningUpper -> Color(0xFFFF7500)
+                                else -> MaterialTheme.colorScheme.onPrimary
+                            }
+                        else
+                            MaterialTheme.colorScheme.tertiaryContainer,
+                        fontWeight = FontWeight.Black,
+                        fontFamily = font
+                    )
+                }
+            }
+
+            Text(
+                text = "土壤温度",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableGetData)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            Card(
+                modifier = Modifier
+                    .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
+                    .fillMaxWidth()
+                    .height(64.dp),
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(
+                    containerColor = if (enableGetData)
+                        MaterialTheme.colorScheme.background
+                    else
+                        MaterialTheme.colorScheme.onBackground,
+                )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                if (enableGetData)
+                                    when {
+                                        soilTemperatureProgress < soilTemperatureAlarmLower -> Color(0xFFCCA4E3)
+                                        soilTemperatureProgress > soilTemperatureAlarmUpper -> Color(0xFFf47983)
+                                        soilTemperatureProgress < soilTemperatureWarningLower -> Color(0xFF70F3FF)
+                                        soilTemperatureProgress > soilTemperatureWarningUpper -> Color(0xFFFFA400)
+                                        else -> MaterialTheme.colorScheme.primary
+                                    }
+                                else
+                                    MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                            .align(Alignment.CenterStart)
+                            .fillMaxHeight()
+                            .fillMaxWidth(soilTemperatureProgress / 100f)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(horizontal = 8.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.DeviceThermostat,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(32.dp),
+                            tint = if (enableGetData)
+                                when {
+                                    soilTemperatureProgress < soilTemperatureAlarmLower -> Color(0xFF801DAE)
+                                    soilTemperatureProgress > soilTemperatureAlarmUpper -> Color(0xFFF00056)
+                                    soilTemperatureProgress < soilTemperatureWarningLower -> Color(0xFF44CEF6)
+                                    soilTemperatureProgress > soilTemperatureWarningUpper -> Color(0xFFFF7500)
+                                    else -> MaterialTheme.colorScheme.onPrimary
+                                }
+                            else
+                                MaterialTheme.colorScheme.tertiaryContainer
+                        )
+                    }
+
+                    Text(
+                        text = when {
+                            soilTemperature < 0f -> "超出下限"
+                            soilTemperature > 100f -> "超出上限"
+                            else -> "${(soilTemperature * 100f).roundToInt() / 100f}℃"
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(horizontal = 8.dp),
+                        fontSize = 20.sp,
+                        color = if (enableGetData)
+                            when {
+                                soilTemperatureProgress < soilTemperatureAlarmLower -> Color(0xFF801DAE)
+                                soilTemperatureProgress > soilTemperatureAlarmUpper -> Color(0xFFF00056)
+                                soilTemperatureProgress < soilTemperatureWarningLower -> Color(0xFF44CEF6)
+                                soilTemperatureProgress > soilTemperatureWarningUpper -> Color(0xFFFF7500)
+                                else -> MaterialTheme.colorScheme.onPrimary
+                            }
+                        else
+                            MaterialTheme.colorScheme.tertiaryContainer,
+                        fontWeight = FontWeight.Black,
+                        fontFamily = font
+                    )
+                }
+            }
+
+            Text(
+                text = "土壤湿度",
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
+                fontSize = 12.sp,
+                color = if (enableGetData)
+                    MaterialTheme.colorScheme.inversePrimary
+                else
+                    MaterialTheme.colorScheme.onTertiary,
+                fontWeight = FontWeight.Medium,
+                fontFamily = font
+            )
+
+            Card(
+                modifier = Modifier
+                    .padding(bottom = 16.dp, start = 16.dp, end = 16.dp)
+                    .fillMaxWidth()
+                    .height(64.dp),
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(
+                    containerColor = if (enableGetData)
+                        MaterialTheme.colorScheme.background
+                    else
+                        MaterialTheme.colorScheme.onBackground,
+                )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                if (enableGetData)
+                                    when {
+                                        soilHumidityProgress < soilHumidityAlarmLower -> Color(0xFFCCA4E3)
+                                        soilHumidityProgress > soilHumidityAlarmUpper -> Color(0xFFf47983)
+                                        soilHumidityProgress < soilHumidityWarningLower -> Color(0xFF70F3FF)
+                                        soilHumidityProgress > soilHumidityWarningUpper -> Color(0xFFFFA400)
+                                        else -> MaterialTheme.colorScheme.primary
+                                    }
+                                else
+                                    MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                            .align(Alignment.CenterStart)
+                            .fillMaxHeight()
+                            .fillMaxWidth(soilHumidityProgress / 100f)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(horizontal = 8.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.WaterDrop,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(32.dp),
+                            tint = if (enableGetData)
+                                when {
+                                    soilHumidityProgress < soilHumidityAlarmLower -> Color(0xFF801DAE)
+                                    soilHumidityProgress > soilHumidityAlarmUpper -> Color(0xFFF00056)
+                                    soilHumidityProgress < soilHumidityWarningLower -> Color(0xFF44CEF6)
+                                    soilHumidityProgress > soilHumidityWarningUpper -> Color(0xFFFF7500)
+                                    else -> MaterialTheme.colorScheme.onPrimary
+                                }
+                            else
+                                MaterialTheme.colorScheme.tertiaryContainer
+                        )
+                    }
+
+                    Text(
+                        text = when {
+                            soilHumidity < 0f -> "超出下限"
+                            soilHumidity > 100f -> "超出上限"
+                            else -> "${(soilHumidity * 100f).roundToInt() / 100f}%RH"
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(horizontal = 8.dp),
+                        fontSize = 20.sp,
+                        color = if (enableGetData)
+                            when {
+                                soilHumidityProgress < soilHumidityAlarmLower -> Color(0xFF801DAE)
+                                soilHumidityProgress > soilHumidityAlarmUpper -> Color(0xFFF00056)
+                                soilHumidityProgress < soilHumidityWarningLower -> Color(0xFF44CEF6)
+                                soilHumidityProgress > soilHumidityWarningUpper -> Color(0xFFFF7500)
+                                else -> MaterialTheme.colorScheme.onPrimary
+                            }
+                        else
+                            MaterialTheme.colorScheme.tertiaryContainer,
+                        fontWeight = FontWeight.Black,
+                        fontFamily = font
+                    )
+                }
             }
         }
     }

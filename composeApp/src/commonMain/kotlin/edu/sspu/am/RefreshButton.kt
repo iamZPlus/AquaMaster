@@ -41,6 +41,11 @@ fun RefreshButton(
                         ui.scope.launch {
                             delay(3000)
                             ui.settings.machine.refreshing.off()
+                            ui.settings.machine.refreshing.off()
+                            ui.settings.machine.sensor.air.temperature set 33.33f
+                            ui.settings.machine.sensor.air.humidity set 45.5f
+                            ui.settings.machine.sensor.soil.temperature set 101f
+                            ui.settings.machine.sensor.soil.humidity set -1f
                         }
                     }
                 }
