@@ -203,7 +203,7 @@ class UI : ViewModel() {
 
         val machineSettingsData = loadMachineSettingsData()
         if (machineSettingsData.current != null) {
-            settings.machine.set(machineSettingsData.current)
+            settings.machine set machineSettingsData.current
         }
         data.list set machineSettingsData.list
     }
@@ -611,7 +611,7 @@ class UI : ViewModel() {
             private val _current = MutableStateFlow<MachineData?>(null)
             val current = _current.asStateFlow()
 
-            fun set(machine: MachineData) {
+            infix fun set(machine: MachineData) {
                 _current.value = machine
             }
 

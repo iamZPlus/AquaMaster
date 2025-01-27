@@ -230,7 +230,7 @@ fun MachineCard(
     Card(
         modifier = modifier
             .clickable {
-                ui.settings.machine.set(machine)
+                ui.settings.machine set machine
                 ui goto RootScreens.List.child(
                     Page(
                         id = "MachineController",
