@@ -119,8 +119,8 @@ fun MachineController(
     val floatingMachineAlarmToAISettingCard by floatingMachineAlarmToAISettingCardState
     val floatingMachineWarningToAISettingCard by floatingMachineWarningToAISettingCardState
 
-    var enableControl = remember { mutableStateOf(true) }
-    var enableGetData = remember { mutableStateOf(true) }
+    var enableControl by remember { mutableStateOf(true) }
+    var enableGetData by remember { mutableStateOf(true) }
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
@@ -813,12 +813,11 @@ fun MachineSensorDataCard(
     ui: UI,
     modifier: Modifier = Modifier,
     url: MachineUrl,
-    enable: MutableState<Boolean> = remember { mutableStateOf(true) },
+    enable: Boolean = true,
     floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
 
-    val enableGetData by enable
     Column(
         modifier = modifier
     ) {
@@ -826,7 +825,7 @@ fun MachineSensorDataCard(
             text = "传感器数据",
             modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp),
             fontSize = 16.sp,
-            color = if (enableGetData)
+            color = if (enable)
                 MaterialTheme.colorScheme.inversePrimary
             else
                 MaterialTheme.colorScheme.onTertiary,
@@ -844,7 +843,7 @@ fun MachineSensorDataCard(
                 ) {},
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
-                containerColor = if (enableGetData)
+                containerColor = if (enable)
                     MaterialTheme.colorScheme.primaryContainer
                 else
                     MaterialTheme.colorScheme.tertiaryContainer
@@ -909,7 +908,7 @@ fun MachineSensorDataCard(
                 text = "空气温度",
                 modifier = Modifier.padding(top = 16.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableGetData)
+                color = if (enable)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -924,7 +923,7 @@ fun MachineSensorDataCard(
                     .height(64.dp),
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(
-                    containerColor = if (enableGetData)
+                    containerColor = if (enable)
                         MaterialTheme.colorScheme.background
                     else
                         MaterialTheme.colorScheme.onBackground,
@@ -937,7 +936,7 @@ fun MachineSensorDataCard(
                     Box(
                         modifier = Modifier
                             .background(
-                                if (enableGetData)
+                                if (enable)
                                     when {
                                         airTemperatureProgress < airTemperatureAlarmLower -> Color(0xFFCCA4E3)
                                         airTemperatureProgress > airTemperatureAlarmUpper -> Color(0xFFf47983)
@@ -964,7 +963,7 @@ fun MachineSensorDataCard(
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .size(32.dp),
-                            tint = if (enableGetData)
+                            tint = if (enable)
                                 when {
                                     airTemperatureProgress < airTemperatureAlarmLower -> Color(0xFF801DAE)
                                     airTemperatureProgress > airTemperatureAlarmUpper -> Color(0xFFF00056)
@@ -987,7 +986,7 @@ fun MachineSensorDataCard(
                             .align(Alignment.CenterEnd)
                             .padding(horizontal = 8.dp),
                         fontSize = 20.sp,
-                        color = if (enableGetData)
+                        color = if (enable)
                             when {
                                 airTemperatureProgress < airTemperatureAlarmLower -> Color(0xFF801DAE)
                                 airTemperatureProgress > airTemperatureAlarmUpper -> Color(0xFFF00056)
@@ -1007,7 +1006,7 @@ fun MachineSensorDataCard(
                 text = "空气湿度",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableGetData)
+                color = if (enable)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -1022,7 +1021,7 @@ fun MachineSensorDataCard(
                     .height(64.dp),
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(
-                    containerColor = if (enableGetData)
+                    containerColor = if (enable)
                         MaterialTheme.colorScheme.background
                     else
                         MaterialTheme.colorScheme.onBackground,
@@ -1035,7 +1034,7 @@ fun MachineSensorDataCard(
                     Box(
                         modifier = Modifier
                             .background(
-                                if (enableGetData)
+                                if (enable)
                                     when {
                                         airHumidityProgress < airHumidityAlarmLower -> Color(0xFFCCA4E3)
                                         airHumidityProgress > airHumidityAlarmUpper -> Color(0xFFf47983)
@@ -1062,7 +1061,7 @@ fun MachineSensorDataCard(
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .size(32.dp),
-                            tint = if (enableGetData)
+                            tint = if (enable)
                                 when {
                                     airHumidityProgress < airHumidityAlarmLower -> Color(0xFF801DAE)
                                     airHumidityProgress > airHumidityAlarmUpper -> Color(0xFFF00056)
@@ -1085,7 +1084,7 @@ fun MachineSensorDataCard(
                             .align(Alignment.CenterEnd)
                             .padding(horizontal = 8.dp),
                         fontSize = 20.sp,
-                        color = if (enableGetData)
+                        color = if (enable)
                             when {
                                 airHumidityProgress < airHumidityAlarmLower -> Color(0xFF801DAE)
                                 airHumidityProgress > airHumidityAlarmUpper -> Color(0xFFF00056)
@@ -1105,7 +1104,7 @@ fun MachineSensorDataCard(
                 text = "土壤温度",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableGetData)
+                color = if (enable)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -1120,7 +1119,7 @@ fun MachineSensorDataCard(
                     .height(64.dp),
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(
-                    containerColor = if (enableGetData)
+                    containerColor = if (enable)
                         MaterialTheme.colorScheme.background
                     else
                         MaterialTheme.colorScheme.onBackground,
@@ -1133,7 +1132,7 @@ fun MachineSensorDataCard(
                     Box(
                         modifier = Modifier
                             .background(
-                                if (enableGetData)
+                                if (enable)
                                     when {
                                         soilTemperatureProgress < soilTemperatureAlarmLower -> Color(0xFFCCA4E3)
                                         soilTemperatureProgress > soilTemperatureAlarmUpper -> Color(0xFFf47983)
@@ -1160,7 +1159,7 @@ fun MachineSensorDataCard(
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .size(32.dp),
-                            tint = if (enableGetData)
+                            tint = if (enable)
                                 when {
                                     soilTemperatureProgress < soilTemperatureAlarmLower -> Color(0xFF801DAE)
                                     soilTemperatureProgress > soilTemperatureAlarmUpper -> Color(0xFFF00056)
@@ -1183,7 +1182,7 @@ fun MachineSensorDataCard(
                             .align(Alignment.CenterEnd)
                             .padding(horizontal = 8.dp),
                         fontSize = 20.sp,
-                        color = if (enableGetData)
+                        color = if (enable)
                             when {
                                 soilTemperatureProgress < soilTemperatureAlarmLower -> Color(0xFF801DAE)
                                 soilTemperatureProgress > soilTemperatureAlarmUpper -> Color(0xFFF00056)
@@ -1203,7 +1202,7 @@ fun MachineSensorDataCard(
                 text = "土壤湿度",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableGetData)
+                color = if (enable)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -1218,7 +1217,7 @@ fun MachineSensorDataCard(
                     .height(64.dp),
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(
-                    containerColor = if (enableGetData)
+                    containerColor = if (enable)
                         MaterialTheme.colorScheme.background
                     else
                         MaterialTheme.colorScheme.onBackground,
@@ -1231,7 +1230,7 @@ fun MachineSensorDataCard(
                     Box(
                         modifier = Modifier
                             .background(
-                                if (enableGetData)
+                                if (enable)
                                     when {
                                         soilHumidityProgress < soilHumidityAlarmLower -> Color(0xFFCCA4E3)
                                         soilHumidityProgress > soilHumidityAlarmUpper -> Color(0xFFf47983)
@@ -1258,7 +1257,7 @@ fun MachineSensorDataCard(
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .size(32.dp),
-                            tint = if (enableGetData)
+                            tint = if (enable)
                                 when {
                                     soilHumidityProgress < soilHumidityAlarmLower -> Color(0xFF801DAE)
                                     soilHumidityProgress > soilHumidityAlarmUpper -> Color(0xFFF00056)
@@ -1281,7 +1280,7 @@ fun MachineSensorDataCard(
                             .align(Alignment.CenterEnd)
                             .padding(horizontal = 8.dp),
                         fontSize = 20.sp,
-                        color = if (enableGetData)
+                        color = if (enable)
                             when {
                                 soilHumidityProgress < soilHumidityAlarmLower -> Color(0xFF801DAE)
                                 soilHumidityProgress > soilHumidityAlarmUpper -> Color(0xFFF00056)
@@ -1306,12 +1305,10 @@ fun MachineControlCard(
     ui: UI,
     modifier: Modifier = Modifier,
     url: MachineUrl,
-    enable: MutableState<Boolean> = remember { mutableStateOf(true) },
+    enable: Boolean = true,
     floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
-
-    val enableControl by enable
 
     Column(
         modifier = modifier
@@ -1320,7 +1317,7 @@ fun MachineControlCard(
             text = "设备操控",
             modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp),
             fontSize = 16.sp,
-            color = if (enableControl)
+            color = if (enable)
                 MaterialTheme.colorScheme.inversePrimary
             else
                 MaterialTheme.colorScheme.onTertiary,
@@ -1338,7 +1335,7 @@ fun MachineControlCard(
                 ) {},
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
-                containerColor = if (enableControl)
+                containerColor = if (enable)
                     MaterialTheme.colorScheme.primaryContainer
                 else
                     MaterialTheme.colorScheme.tertiaryContainer
@@ -1367,7 +1364,7 @@ fun MachineControlCard(
             Slider(
                 state = windState,
                 modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl,
+                enabled = enable,
                 thumb = {},
                 track = {
                     Card(
@@ -1376,7 +1373,7 @@ fun MachineControlCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl)
+                            containerColor = if (enable)
                                 MaterialTheme.colorScheme.background
                             else
                                 MaterialTheme.colorScheme.onBackground,
@@ -1389,7 +1386,7 @@ fun MachineControlCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.primary
                                         else
                                             MaterialTheme.colorScheme.onTertiaryContainer
@@ -1414,7 +1411,7 @@ fun MachineControlCard(
                                     modifier = Modifier
                                         .align(Alignment.Center)
                                         .size(32.dp),
-                                    tint = if (enableControl)
+                                    tint = if (enable)
                                         MaterialTheme.colorScheme.onPrimary
                                     else
                                         MaterialTheme.colorScheme.tertiaryContainer
@@ -1427,7 +1424,7 @@ fun MachineControlCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -1442,7 +1439,7 @@ fun MachineControlCard(
             Slider(
                 state = waterState,
                 modifier = Modifier.padding(top = 8.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl,
+                enabled = enable,
                 thumb = {},
                 track = {
                     Card(
@@ -1451,7 +1448,7 @@ fun MachineControlCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl)
+                            containerColor = if (enable)
                                 MaterialTheme.colorScheme.background
                             else
                                 MaterialTheme.colorScheme.onBackground,
@@ -1464,7 +1461,7 @@ fun MachineControlCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.primary
                                         else
                                             MaterialTheme.colorScheme.onTertiaryContainer
@@ -1489,7 +1486,7 @@ fun MachineControlCard(
                                     modifier = Modifier
                                         .align(Alignment.Center)
                                         .size(32.dp),
-                                    tint = if (enableControl)
+                                    tint = if (enable)
                                         MaterialTheme.colorScheme.onPrimary
                                     else
                                         MaterialTheme.colorScheme.tertiaryContainer
@@ -1502,7 +1499,7 @@ fun MachineControlCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -1523,12 +1520,10 @@ fun MachineAlarmToAdministerSettingCard(
     ui: UI,
     modifier: Modifier = Modifier,
     url: MachineUrl,
-    enable: MutableState<Boolean> = remember { mutableStateOf(true) },
+    enable: Boolean = true,
     floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
-
-    val enableControl by enable
 
     Column(
         modifier = modifier
@@ -1537,7 +1532,7 @@ fun MachineAlarmToAdministerSettingCard(
             text = "管理员警报设置",
             modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp),
             fontSize = 16.sp,
-            color = if (enableControl)
+            color = if (enable)
                 MaterialTheme.colorScheme.inversePrimary
             else
                 MaterialTheme.colorScheme.onTertiary,
@@ -1555,7 +1550,7 @@ fun MachineAlarmToAdministerSettingCard(
                 ) {},
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
-                containerColor = if (enableControl)
+                containerColor = if (enable)
                     MaterialTheme.colorScheme.primaryContainer
                 else
                     MaterialTheme.colorScheme.tertiaryContainer
@@ -1617,7 +1612,7 @@ fun MachineAlarmToAdministerSettingCard(
                 text = "空气温度区间",
                 modifier = Modifier.padding(top = 16.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl)
+                color = if (enable)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -1628,7 +1623,7 @@ fun MachineAlarmToAdministerSettingCard(
             RangeSlider(
                 state = airTemperatureState,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl,
+                enabled = enable,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -1638,7 +1633,7 @@ fun MachineAlarmToAdministerSettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl)
+                            containerColor = if (enable)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -1651,7 +1646,7 @@ fun MachineAlarmToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -1663,7 +1658,7 @@ fun MachineAlarmToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -1679,7 +1674,7 @@ fun MachineAlarmToAdministerSettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -1692,7 +1687,7 @@ fun MachineAlarmToAdministerSettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -1708,7 +1703,7 @@ fun MachineAlarmToAdministerSettingCard(
                 text = "空气湿度区间",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl)
+                color = if (enable)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -1719,7 +1714,7 @@ fun MachineAlarmToAdministerSettingCard(
             RangeSlider(
                 state = airHumidityState,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl,
+                enabled = enable,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -1729,7 +1724,7 @@ fun MachineAlarmToAdministerSettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl)
+                            containerColor = if (enable)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -1742,7 +1737,7 @@ fun MachineAlarmToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -1754,7 +1749,7 @@ fun MachineAlarmToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -1770,7 +1765,7 @@ fun MachineAlarmToAdministerSettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -1783,7 +1778,7 @@ fun MachineAlarmToAdministerSettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -1799,7 +1794,7 @@ fun MachineAlarmToAdministerSettingCard(
                 text = "土壤温度区间",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl)
+                color = if (enable)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -1810,7 +1805,7 @@ fun MachineAlarmToAdministerSettingCard(
             RangeSlider(
                 state = soilTemperatureState,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl,
+                enabled = enable,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -1820,7 +1815,7 @@ fun MachineAlarmToAdministerSettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl)
+                            containerColor = if (enable)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -1833,7 +1828,7 @@ fun MachineAlarmToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -1845,7 +1840,7 @@ fun MachineAlarmToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -1861,7 +1856,7 @@ fun MachineAlarmToAdministerSettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -1874,7 +1869,7 @@ fun MachineAlarmToAdministerSettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -1890,7 +1885,7 @@ fun MachineAlarmToAdministerSettingCard(
                 text = "土壤湿度区间",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl)
+                color = if (enable)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -1901,7 +1896,7 @@ fun MachineAlarmToAdministerSettingCard(
             RangeSlider(
                 state = soilHumidityState,
                 modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl,
+                enabled = enable,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -1911,7 +1906,7 @@ fun MachineAlarmToAdministerSettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl)
+                            containerColor = if (enable)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -1924,7 +1919,7 @@ fun MachineAlarmToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -1936,7 +1931,7 @@ fun MachineAlarmToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -1952,7 +1947,7 @@ fun MachineAlarmToAdministerSettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -1965,7 +1960,7 @@ fun MachineAlarmToAdministerSettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -1986,12 +1981,10 @@ fun MachineWarningToAdministerSettingCard(
     ui: UI,
     modifier: Modifier = Modifier,
     url: MachineUrl,
-    enable: MutableState<Boolean> = remember { mutableStateOf(true) },
+    enable: Boolean = true,
     floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
-
-    val enableControl by enable
 
     Column(
         modifier = modifier
@@ -2000,7 +1993,7 @@ fun MachineWarningToAdministerSettingCard(
             text = "管理员提醒设置",
             modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp),
             fontSize = 16.sp,
-            color = if (enableControl)
+            color = if (enable)
                 MaterialTheme.colorScheme.inversePrimary
             else
                 MaterialTheme.colorScheme.onTertiary,
@@ -2018,7 +2011,7 @@ fun MachineWarningToAdministerSettingCard(
                 ) {},
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
-                containerColor = if (enableControl)
+                containerColor = if (enable)
                     MaterialTheme.colorScheme.primaryContainer
                 else
                     MaterialTheme.colorScheme.tertiaryContainer
@@ -2080,7 +2073,7 @@ fun MachineWarningToAdministerSettingCard(
                 text = "空气温度区间",
                 modifier = Modifier.padding(top = 16.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl)
+                color = if (enable)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -2091,7 +2084,7 @@ fun MachineWarningToAdministerSettingCard(
             RangeSlider(
                 state = airTemperatureState,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl,
+                enabled = enable,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -2101,7 +2094,7 @@ fun MachineWarningToAdministerSettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl)
+                            containerColor = if (enable)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -2114,7 +2107,7 @@ fun MachineWarningToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2126,7 +2119,7 @@ fun MachineWarningToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2142,7 +2135,7 @@ fun MachineWarningToAdministerSettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2155,7 +2148,7 @@ fun MachineWarningToAdministerSettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2171,7 +2164,7 @@ fun MachineWarningToAdministerSettingCard(
                 text = "空气湿度区间",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl)
+                color = if (enable)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -2182,7 +2175,7 @@ fun MachineWarningToAdministerSettingCard(
             RangeSlider(
                 state = airHumidityState,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl,
+                enabled = enable,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -2192,7 +2185,7 @@ fun MachineWarningToAdministerSettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl)
+                            containerColor = if (enable)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -2205,7 +2198,7 @@ fun MachineWarningToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2217,7 +2210,7 @@ fun MachineWarningToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2233,7 +2226,7 @@ fun MachineWarningToAdministerSettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2246,7 +2239,7 @@ fun MachineWarningToAdministerSettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2262,7 +2255,7 @@ fun MachineWarningToAdministerSettingCard(
                 text = "土壤温度区间",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl)
+                color = if (enable)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -2273,7 +2266,7 @@ fun MachineWarningToAdministerSettingCard(
             RangeSlider(
                 state = soilTemperatureState,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl,
+                enabled = enable,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -2283,7 +2276,7 @@ fun MachineWarningToAdministerSettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl)
+                            containerColor = if (enable)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -2296,7 +2289,7 @@ fun MachineWarningToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2308,7 +2301,7 @@ fun MachineWarningToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2324,7 +2317,7 @@ fun MachineWarningToAdministerSettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2337,7 +2330,7 @@ fun MachineWarningToAdministerSettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2353,7 +2346,7 @@ fun MachineWarningToAdministerSettingCard(
                 text = "土壤湿度区间",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl)
+                color = if (enable)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -2364,7 +2357,7 @@ fun MachineWarningToAdministerSettingCard(
             RangeSlider(
                 state = soilHumidityState,
                 modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl,
+                enabled = enable,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -2374,7 +2367,7 @@ fun MachineWarningToAdministerSettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl)
+                            containerColor = if (enable)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -2387,7 +2380,7 @@ fun MachineWarningToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2399,7 +2392,7 @@ fun MachineWarningToAdministerSettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl)
+                                        if (enable)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2415,7 +2408,7 @@ fun MachineWarningToAdministerSettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2428,7 +2421,7 @@ fun MachineWarningToAdministerSettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl)
+                                color = if (enable)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2449,12 +2442,11 @@ fun MachineAlarmToAISettingCard(
     ui: UI,
     modifier: Modifier = Modifier,
     url: MachineUrl,
-    enable: MutableState<Boolean> = remember { mutableStateOf(true) },
+    enable: Boolean = true,
     floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
 
-    val enableControl by enable
     val enableAIOperateWhenAlarm by ui.settings.machine.ai.operateWhenAlarm.enable.collectAsState()
 
     Column(
@@ -2464,7 +2456,7 @@ fun MachineAlarmToAISettingCard(
             text = "AI警报介入设置",
             modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp),
             fontSize = 16.sp,
-            color = if (enableControl and enableAIOperateWhenAlarm)
+            color = if (enable and enableAIOperateWhenAlarm)
                 MaterialTheme.colorScheme.inversePrimary
             else
                 MaterialTheme.colorScheme.onTertiary,
@@ -2482,7 +2474,7 @@ fun MachineAlarmToAISettingCard(
                 ) {},
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
-                containerColor = if (enableControl and enableAIOperateWhenAlarm)
+                containerColor = if (enable and enableAIOperateWhenAlarm)
                     MaterialTheme.colorScheme.primaryContainer
                 else
                     MaterialTheme.colorScheme.tertiaryContainer
@@ -2544,7 +2536,7 @@ fun MachineAlarmToAISettingCard(
                 text = "空气温度区间",
                 modifier = Modifier.padding(top = 16.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl and enableAIOperateWhenAlarm)
+                color = if (enable and enableAIOperateWhenAlarm)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -2555,7 +2547,7 @@ fun MachineAlarmToAISettingCard(
             RangeSlider(
                 state = airTemperatureState,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl and enableAIOperateWhenAlarm,
+                enabled = enable and enableAIOperateWhenAlarm,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -2565,7 +2557,7 @@ fun MachineAlarmToAISettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl and enableAIOperateWhenAlarm)
+                            containerColor = if (enable and enableAIOperateWhenAlarm)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -2578,7 +2570,7 @@ fun MachineAlarmToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenAlarm)
+                                        if (enable and enableAIOperateWhenAlarm)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2590,7 +2582,7 @@ fun MachineAlarmToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenAlarm)
+                                        if (enable and enableAIOperateWhenAlarm)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2606,7 +2598,7 @@ fun MachineAlarmToAISettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                color = if (enable and enableAIOperateWhenAlarm)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2619,7 +2611,7 @@ fun MachineAlarmToAISettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                color = if (enable and enableAIOperateWhenAlarm)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2635,7 +2627,7 @@ fun MachineAlarmToAISettingCard(
                 text = "空气湿度区间",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl and enableAIOperateWhenAlarm)
+                color = if (enable and enableAIOperateWhenAlarm)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -2646,7 +2638,7 @@ fun MachineAlarmToAISettingCard(
             RangeSlider(
                 state = airHumidityState,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl and enableAIOperateWhenAlarm,
+                enabled = enable and enableAIOperateWhenAlarm,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -2656,7 +2648,7 @@ fun MachineAlarmToAISettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl and enableAIOperateWhenAlarm)
+                            containerColor = if (enable and enableAIOperateWhenAlarm)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -2669,7 +2661,7 @@ fun MachineAlarmToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenAlarm)
+                                        if (enable and enableAIOperateWhenAlarm)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2681,7 +2673,7 @@ fun MachineAlarmToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenAlarm)
+                                        if (enable and enableAIOperateWhenAlarm)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2697,7 +2689,7 @@ fun MachineAlarmToAISettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                color = if (enable and enableAIOperateWhenAlarm)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2710,7 +2702,7 @@ fun MachineAlarmToAISettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                color = if (enable and enableAIOperateWhenAlarm)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2726,7 +2718,7 @@ fun MachineAlarmToAISettingCard(
                 text = "土壤温度区间",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl and enableAIOperateWhenAlarm)
+                color = if (enable and enableAIOperateWhenAlarm)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -2737,7 +2729,7 @@ fun MachineAlarmToAISettingCard(
             RangeSlider(
                 state = soilTemperatureState,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl and enableAIOperateWhenAlarm,
+                enabled = enable and enableAIOperateWhenAlarm,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -2747,7 +2739,7 @@ fun MachineAlarmToAISettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl and enableAIOperateWhenAlarm)
+                            containerColor = if (enable and enableAIOperateWhenAlarm)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -2760,7 +2752,7 @@ fun MachineAlarmToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenAlarm)
+                                        if (enable and enableAIOperateWhenAlarm)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2772,7 +2764,7 @@ fun MachineAlarmToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenAlarm)
+                                        if (enable and enableAIOperateWhenAlarm)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2788,7 +2780,7 @@ fun MachineAlarmToAISettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                color = if (enable and enableAIOperateWhenAlarm)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2801,7 +2793,7 @@ fun MachineAlarmToAISettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                color = if (enable and enableAIOperateWhenAlarm)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2817,7 +2809,7 @@ fun MachineAlarmToAISettingCard(
                 text = "土壤湿度区间",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl and enableAIOperateWhenAlarm)
+                color = if (enable and enableAIOperateWhenAlarm)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -2828,7 +2820,7 @@ fun MachineAlarmToAISettingCard(
             RangeSlider(
                 state = soilHumidityState,
                 modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl and enableAIOperateWhenAlarm,
+                enabled = enable and enableAIOperateWhenAlarm,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -2838,7 +2830,7 @@ fun MachineAlarmToAISettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl and enableAIOperateWhenAlarm)
+                            containerColor = if (enable and enableAIOperateWhenAlarm)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -2851,7 +2843,7 @@ fun MachineAlarmToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenAlarm)
+                                        if (enable and enableAIOperateWhenAlarm)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2863,7 +2855,7 @@ fun MachineAlarmToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenAlarm)
+                                        if (enable and enableAIOperateWhenAlarm)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -2879,7 +2871,7 @@ fun MachineAlarmToAISettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                color = if (enable and enableAIOperateWhenAlarm)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2892,7 +2884,7 @@ fun MachineAlarmToAISettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenAlarm)
+                                color = if (enable and enableAIOperateWhenAlarm)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -2913,12 +2905,11 @@ fun MachineWarningToAISettingCard(
     ui: UI,
     modifier: Modifier = Modifier,
     url: MachineUrl,
-    enable: MutableState<Boolean> = remember { mutableStateOf(true) },
+    enable: Boolean = true,
     floatingState: MutableState<Boolean> = remember { mutableStateOf(false) }
 ) {
     val font by ui.font.collectAsState()
 
-    val enableControl by enable
     val enableAIOperateWhenWarning by ui.settings.machine.ai.operateWhenWarning.enable.collectAsState()
 
     Column(
@@ -2928,7 +2919,7 @@ fun MachineWarningToAISettingCard(
             text = "AI提醒介入设置",
             modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 6.dp),
             fontSize = 16.sp,
-            color = if (enableControl and enableAIOperateWhenWarning)
+            color = if (enable and enableAIOperateWhenWarning)
                 MaterialTheme.colorScheme.inversePrimary
             else
                 MaterialTheme.colorScheme.onTertiary,
@@ -2946,7 +2937,7 @@ fun MachineWarningToAISettingCard(
                 ) {},
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
-                containerColor = if (enableControl and enableAIOperateWhenWarning)
+                containerColor = if (enable and enableAIOperateWhenWarning)
                     MaterialTheme.colorScheme.primaryContainer
                 else
                     MaterialTheme.colorScheme.tertiaryContainer
@@ -3008,7 +2999,7 @@ fun MachineWarningToAISettingCard(
                 text = "空气温度区间",
                 modifier = Modifier.padding(top = 16.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl and enableAIOperateWhenWarning)
+                color = if (enable and enableAIOperateWhenWarning)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -3019,7 +3010,7 @@ fun MachineWarningToAISettingCard(
             RangeSlider(
                 state = airTemperatureState,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl and enableAIOperateWhenWarning,
+                enabled = enable and enableAIOperateWhenWarning,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -3029,7 +3020,7 @@ fun MachineWarningToAISettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl and enableAIOperateWhenWarning)
+                            containerColor = if (enable and enableAIOperateWhenWarning)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -3042,7 +3033,7 @@ fun MachineWarningToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenWarning)
+                                        if (enable and enableAIOperateWhenWarning)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -3054,7 +3045,7 @@ fun MachineWarningToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenWarning)
+                                        if (enable and enableAIOperateWhenWarning)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -3070,7 +3061,7 @@ fun MachineWarningToAISettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenWarning)
+                                color = if (enable and enableAIOperateWhenWarning)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -3083,7 +3074,7 @@ fun MachineWarningToAISettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenWarning)
+                                color = if (enable and enableAIOperateWhenWarning)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -3099,7 +3090,7 @@ fun MachineWarningToAISettingCard(
                 text = "空气湿度区间",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl and enableAIOperateWhenWarning)
+                color = if (enable and enableAIOperateWhenWarning)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -3110,7 +3101,7 @@ fun MachineWarningToAISettingCard(
             RangeSlider(
                 state = airHumidityState,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl and enableAIOperateWhenWarning,
+                enabled = enable and enableAIOperateWhenWarning,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -3120,7 +3111,7 @@ fun MachineWarningToAISettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl and enableAIOperateWhenWarning)
+                            containerColor = if (enable and enableAIOperateWhenWarning)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -3133,7 +3124,7 @@ fun MachineWarningToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenWarning)
+                                        if (enable and enableAIOperateWhenWarning)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -3145,7 +3136,7 @@ fun MachineWarningToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenWarning)
+                                        if (enable and enableAIOperateWhenWarning)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -3161,7 +3152,7 @@ fun MachineWarningToAISettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenWarning)
+                                color = if (enable and enableAIOperateWhenWarning)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -3174,7 +3165,7 @@ fun MachineWarningToAISettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenWarning)
+                                color = if (enable and enableAIOperateWhenWarning)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -3190,7 +3181,7 @@ fun MachineWarningToAISettingCard(
                 text = "土壤温度区间",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl and enableAIOperateWhenWarning)
+                color = if (enable and enableAIOperateWhenWarning)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -3201,7 +3192,7 @@ fun MachineWarningToAISettingCard(
             RangeSlider(
                 state = soilTemperatureState,
                 modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl and enableAIOperateWhenWarning,
+                enabled = enable and enableAIOperateWhenWarning,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -3211,7 +3202,7 @@ fun MachineWarningToAISettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl and enableAIOperateWhenWarning)
+                            containerColor = if (enable and enableAIOperateWhenWarning)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -3224,7 +3215,7 @@ fun MachineWarningToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenWarning)
+                                        if (enable and enableAIOperateWhenWarning)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -3236,7 +3227,7 @@ fun MachineWarningToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenWarning)
+                                        if (enable and enableAIOperateWhenWarning)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -3252,7 +3243,7 @@ fun MachineWarningToAISettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenWarning)
+                                color = if (enable and enableAIOperateWhenWarning)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -3265,7 +3256,7 @@ fun MachineWarningToAISettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenWarning)
+                                color = if (enable and enableAIOperateWhenWarning)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -3281,7 +3272,7 @@ fun MachineWarningToAISettingCard(
                 text = "土壤湿度区间",
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 24.dp, end = 16.dp),
                 fontSize = 12.sp,
-                color = if (enableControl and enableAIOperateWhenWarning)
+                color = if (enable and enableAIOperateWhenWarning)
                     MaterialTheme.colorScheme.inversePrimary
                 else
                     MaterialTheme.colorScheme.onTertiary,
@@ -3292,7 +3283,7 @@ fun MachineWarningToAISettingCard(
             RangeSlider(
                 state = soilHumidityState,
                 modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
-                enabled = enableControl and enableAIOperateWhenWarning,
+                enabled = enable and enableAIOperateWhenWarning,
                 startThumb = {},
                 endThumb = {},
                 track = {
@@ -3302,7 +3293,7 @@ fun MachineWarningToAISettingCard(
                             .height(64.dp),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
-                            containerColor = if (enableControl and enableAIOperateWhenWarning)
+                            containerColor = if (enable and enableAIOperateWhenWarning)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -3315,7 +3306,7 @@ fun MachineWarningToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenWarning)
+                                        if (enable and enableAIOperateWhenWarning)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -3327,7 +3318,7 @@ fun MachineWarningToAISettingCard(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        if (enableControl and enableAIOperateWhenWarning)
+                                        if (enable and enableAIOperateWhenWarning)
                                             MaterialTheme.colorScheme.background
                                         else
                                             MaterialTheme.colorScheme.onBackground,
@@ -3343,7 +3334,7 @@ fun MachineWarningToAISettingCard(
                                     .align(Alignment.CenterStart)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenWarning)
+                                color = if (enable and enableAIOperateWhenWarning)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
@@ -3356,7 +3347,7 @@ fun MachineWarningToAISettingCard(
                                     .align(Alignment.CenterEnd)
                                     .padding(horizontal = 8.dp),
                                 fontSize = 20.sp,
-                                color = if (enableControl and enableAIOperateWhenWarning)
+                                color = if (enable and enableAIOperateWhenWarning)
                                     MaterialTheme.colorScheme.onPrimary
                                 else
                                     MaterialTheme.colorScheme.tertiaryContainer,
