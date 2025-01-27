@@ -61,8 +61,6 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
 
-//            implementation(libs.google.accompanist.systemuicontroller)
-
             implementation(libs.ktor.client.cio)
         }
         commonMain.dependencies {
@@ -85,6 +83,7 @@ kotlin {
 
             implementation(libs.github.alexzhirkevich.qrose)
             implementation(libs.github.ismai117.kottie)
+            implementation(libs.github.compose.charts)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -128,13 +127,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-}
-
-dependencies {
-    implementation(libs.androidx.ui.android)
-    implementation(libs.androidx.ui.unit.android)
-    implementation(libs.androidx.animation.android)
-    debugImplementation(compose.uiTooling)
 }
 
 compose.desktop {

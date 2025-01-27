@@ -25,11 +25,9 @@ kotlinx-serialization-plugin = "2.1.0"
 accompanist = "0.37.0"
 qrose = "1.0.1"
 kottie = "1.9.6"
+compose-charts = "0.1.0"
 
 dashscope = "2.18.0"
-uiAndroid = "1.7.6"
-uiUnitAndroid = "1.7.6"
-animationAndroid = "1.7.6"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -63,11 +61,9 @@ jetbrains-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name =
 google-accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
 github-alexzhirkevich-qrose = { group = "io.github.alexzhirkevich", name = "qrose", version.ref = "qrose" }
 github-ismai117-kottie = { group = "io.github.ismai117", name = "kottie", version.ref = "kottie" }
+github-compose-charts = { group = "io.github.ehsannarmani", name = "compose-charts", version.ref = "compose-charts" }
 
 alibaba-dashscope = { group = "com.alibaba", name = "dashscope-sdk-java", version.ref = "dashscope" }
-androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
-androidx-ui-unit-android = { group = "androidx.compose.ui", name = "ui-unit-android", version.ref = "uiUnitAndroid" }
-androidx-animation-android = { group = "androidx.compose.animation", name = "animation-android", version.ref = "animationAndroid" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
