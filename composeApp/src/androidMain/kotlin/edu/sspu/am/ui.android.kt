@@ -11,6 +11,8 @@ val appHome: File = MainActivity.context.filesDir
 val dataHome = File(appHome, "data")
 val settingsHome = File(dataHome, "settings")
 val settingsFile = File(settingsHome, ".settings")
+val machineSettingsHome = File(dataHome, "machineSettings")
+val machineSettingsFile = File(machineSettingsHome, ".settings")
 
 
 actual fun saveSettingsData(data: DataStore.Settings) {
@@ -24,6 +26,22 @@ actual fun saveSettingsData(data: DataStore.Settings) {
 actual fun loadSettingsData(): DataStore.Settings = Json.decodeFromString(
     try {
         settingsFile.readText()
+    } catch (e: IOException) {
+        "{}"
+    }
+)
+
+actual fun saveMachineSettingsData(data: DataStore.MachineSettings) {
+    if (!machineSettingsHome.exists()) {
+        machineSettingsHome.mkdirs()
+    }
+
+    machineSettingsFile.writeText(Json.encodeToString(data))
+}
+
+actual fun loadMachineSettingsData(): DataStore.MachineSettings = Json.decodeFromString(
+    try {
+        machineSettingsFile.readText()
     } catch (e: IOException) {
         "{}"
     }

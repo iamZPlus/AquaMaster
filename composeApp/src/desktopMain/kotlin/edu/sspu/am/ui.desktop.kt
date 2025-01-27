@@ -21,8 +21,14 @@ val dataHome = File(dataHomeName)
 val settingsHomeName = "$dataHomeName\\settings"
 val settingsHome = File(settingsHomeName)
 
-val settingsFileName = "$settingsHome\\.settings"
+val settingsFileName = "$settingsHomeName\\.settings"
 val settingsFile = File(settingsFileName)
+
+val machineSettingsHomeName = "$dataHomeName\\machineSettings"
+val machineSettingsHome = File(machineSettingsHomeName)
+
+val machineSettingsFileName = "$machineSettingsHomeName\\.settings"
+val machineSettingsFile = File(machineSettingsFileName)
 
 actual fun saveSettingsData(data: DataStore.Settings) {
     if (!settingsHome.exists()) {
@@ -35,6 +41,22 @@ actual fun saveSettingsData(data: DataStore.Settings) {
 actual fun loadSettingsData(): DataStore.Settings = Json.decodeFromString(
     try {
         settingsFile.readText()
+    } catch (e: IOException) {
+        "{}"
+    }
+)
+
+actual fun saveMachineSettingsData(data: DataStore.MachineSettings) {
+    if (!machineSettingsHome.exists()) {
+        machineSettingsHome.mkdirs()
+    }
+
+    machineSettingsFile.writeText(Json.encodeToString(data))
+}
+
+actual fun loadMachineSettingsData(): DataStore.MachineSettings = Json.decodeFromString(
+    try {
+        machineSettingsFile.readText()
     } catch (e: IOException) {
         "{}"
     }

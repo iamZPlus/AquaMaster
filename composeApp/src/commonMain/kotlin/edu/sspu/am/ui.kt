@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -152,11 +153,21 @@ object DataStore {
         val screen: String = MetaScreens.app.toString(),
         val theme: Themes = Themes.Light,
     )
+
+    @Serializable
+    data class MachineSettings(
+        val current: MachineData? = null,
+        val list:  List<MachineCategory> = listOf(),
+    )
 }
 
 expect fun saveSettingsData(data: DataStore.Settings)
 
 expect fun loadSettingsData(): DataStore.Settings
+
+expect fun saveMachineSettingsData(data: DataStore.MachineSettings)
+
+expect fun loadMachineSettingsData(): DataStore.MachineSettings
 
 class UI : ViewModel() {
     /**
@@ -177,12 +188,24 @@ class UI : ViewModel() {
         initTheme()
     }
 
-    private fun save(data: DataStore.Settings) = saveSettingsData(data)
+    private fun save(
+        settingsData: DataStore.Settings,
+        machineSettingsData: DataStore.MachineSettings
+    ) {
+        saveSettingsData(settingsData)
+        saveMachineSettingsData(machineSettingsData)
+    }
 
     private fun load() {
-        val data = loadSettingsData()
-        this goto data.screen
-        settings.theme set NameToTheme[data.theme]!!
+        val settingsData = loadSettingsData()
+        this goto settingsData.screen
+        settings.theme set NameToTheme[settingsData.theme]!!
+
+        val machineSettingsData = loadMachineSettingsData()
+        if (machineSettingsData.current != null) {
+            settings.machine.set(machineSettingsData.current)
+        }
+        data.list set machineSettingsData.list
     }
 
     private val _device = MutableStateFlow(DeviceType.Unknown)
@@ -1503,8 +1526,12 @@ class UI : ViewModel() {
                 _categories.value.remove(category)
             }
 
-            fun set(index: Int, category: MachineCategory) {
+            fun setValue(index: Int, category: MachineCategory) {
                 _categories.value[index] = category
+            }
+
+            infix fun set(value: List<MachineCategory>) {
+                _categories.value = value.toMutableStateList()
             }
         }
     }
@@ -1536,13 +1563,20 @@ class UI : ViewModel() {
         val currentScreen by screen.collectAsState()
         val currentTheme by settings.theme.current.collectAsState()
 
+        val currentMachine by settings.machine.current.collectAsState()
+        val currentMachineList by data.list.categories.collectAsState()
+
         save(
-            DataStore.Settings(
+            settingsData = DataStore.Settings(
                 screen = if (currentScreen equal MetaScreens.exit)
                     MetaScreens.app.toString()
                 else
                     currentScreen.toString(),
                 theme = currentTheme.theme
+            ),
+            machineSettingsData = DataStore.MachineSettings(
+                current = currentMachine,
+                list = currentMachineList.toList()
             )
         )
     }

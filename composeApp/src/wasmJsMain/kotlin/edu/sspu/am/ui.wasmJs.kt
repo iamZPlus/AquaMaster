@@ -14,3 +14,14 @@ actual fun saveSettingsData(data: DataStore.Settings) {
 actual fun loadSettingsData(): DataStore.Settings = Json.decodeFromString(
     localStorage.getItem("data.settings") ?: "{}"
 )
+
+actual fun saveMachineSettingsData(data: DataStore.MachineSettings) {
+    localStorage.setItem(
+        key = "data.MachineSettings",
+        value = Json.encodeToString(data)
+    )
+}
+
+actual fun loadMachineSettingsData(): DataStore.MachineSettings = Json.decodeFromString(
+    localStorage.getItem("data.MachineSettings") ?: "{}"
+)

@@ -141,7 +141,7 @@ fun MachinesList(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null,
                                 ) {
-                                    ui.data.list.set(index, category.change(unfold = !category.unfold))
+                                    ui.data.list.setValue(index, category.change(unfold = !category.unfold))
                                 }
                         ) {
                             Icon(
