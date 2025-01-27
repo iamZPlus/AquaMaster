@@ -1441,9 +1441,9 @@ class UI : ViewModel() {
                     val temperature = MachineAirTemperatureData
 
                     object MachineAirTemperatureData {
-                        private val _current = MutableStateFlow(0f)
+                        private val _current = MutableStateFlow(0.0)
                         val current = _current.asStateFlow()
-                        infix fun set(@FloatRange(from = -273.15, to = 100.0) value: Float) {
+                        infix fun set(@FloatRange(from = -273.15, to = 100.0) value: Double) {
                             _current.value = value
                         }
                     }
@@ -1451,9 +1451,9 @@ class UI : ViewModel() {
                     val humidity = MachineAirHumidityData
 
                     object MachineAirHumidityData {
-                        private val _current = MutableStateFlow(0f)
+                        private val _current = MutableStateFlow(0.0)
                         val current = _current.asStateFlow()
-                        infix fun set(@FloatRange(from = 0.0, to = 100.0) value: Float) {
+                        infix fun set(@FloatRange(from = 0.0, to = 100.0) value: Double) {
                             _current.value = value
                         }
                     }
@@ -1465,9 +1465,9 @@ class UI : ViewModel() {
                     val temperature = MachineSoilTemperatureData
 
                     object MachineSoilTemperatureData {
-                        private val _current = MutableStateFlow(0f)
+                        private val _current = MutableStateFlow(0.0)
                         val current = _current.asStateFlow()
-                        infix fun set(@FloatRange(from = -273.15, to = 100.0) value: Float) {
+                        infix fun set(@FloatRange(from = -273.15, to = 100.0) value: Double) {
                             _current.value = value
                         }
                     }
@@ -1475,9 +1475,9 @@ class UI : ViewModel() {
                     val humidity = MachineSoilHumidityData
 
                     object MachineSoilHumidityData {
-                        private val _current = MutableStateFlow(0f)
+                        private val _current = MutableStateFlow(0.0)
                         val current = _current.asStateFlow()
-                        infix fun set(@FloatRange(from = 0.0, to = 100.0) value: Float) {
+                        infix fun set(@FloatRange(from = 0.0, to = 100.0) value: Double) {
                             _current.value = value
                         }
                     }

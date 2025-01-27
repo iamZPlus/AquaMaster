@@ -79,6 +79,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.sspu.am.MachineType.*
+import ir.ehsannarmani.compose_charts.extensions.format
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kottieComposition.KottieCompositionSpec
@@ -129,10 +130,10 @@ fun MachineController(
             ui.scope.launch {
                 delay(3000)
                 ui.settings.machine.refreshing.off()
-                ui.settings.machine.sensor.air.temperature set 33.33f
-                ui.settings.machine.sensor.air.humidity set 45.5f
-                ui.settings.machine.sensor.soil.temperature set 101f
-                ui.settings.machine.sensor.soil.humidity set -1f
+                ui.settings.machine.sensor.air.temperature set 33.33
+                ui.settings.machine.sensor.air.humidity set 45.5
+                ui.settings.machine.sensor.soil.temperature set 101.0
+                ui.settings.machine.sensor.soil.humidity set -1.0
             }
         },
         modifier = modifier,
@@ -873,34 +874,34 @@ fun MachineSensorDataCard(
 
             val airTemperatureProgress by animateFloatAsState(
                 targetValue = when {
-                    airTemperature < 0f -> -0.001f
-                    airTemperature > 100f -> 100.001f
+                    airTemperature < 0.0 -> -1.0
+                    airTemperature > 100.0 -> 101.0
                     else -> airTemperature
-                },
+                }.toFloat(),
                 animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
             )
             val airHumidityProgress by animateFloatAsState(
                 targetValue = when {
-                    airHumidity < 0f -> -0.001f
-                    airHumidity > 100f -> 100.001f
+                    airHumidity < 0.0 -> -1.0
+                    airHumidity > 100.0 -> 101.0
                     else -> airHumidity
-                },
+                }.toFloat(),
                 animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
             )
             val soilTemperatureProgress by animateFloatAsState(
                 targetValue = when {
-                    soilTemperature < 0f -> -0.001f
-                    soilTemperature > 100f -> 100.001f
+                    soilTemperature < 0.0 -> -1.0
+                    soilTemperature > 100.0 -> 101.0
                     else -> soilTemperature
-                },
+                }.toFloat(),
                 animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
             )
             val soilHumidityProgress by animateFloatAsState(
                 targetValue = when {
-                    soilHumidity < 0f -> -0.001f
-                    soilHumidity > 100f -> 100.001f
+                    soilHumidity < 0.0 -> -1.0
+                    soilHumidity > 100.0 -> 101.0
                     else -> soilHumidity
-                },
+                }.toFloat(),
                 animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
             )
 
@@ -978,9 +979,9 @@ fun MachineSensorDataCard(
 
                     Text(
                         text = when {
-                            airTemperature < 0f -> "超出下限"
-                            airTemperature > 100f -> "超出上限"
-                            else -> "${(airTemperature * 100f).roundToInt() / 100.0}℃"
+                            airTemperature < 0.0 -> "超出下限"
+                            airTemperature > 100.0 -> "超出上限"
+                            else -> "${airTemperature.format(2)}℃"
                         },
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
@@ -1076,9 +1077,9 @@ fun MachineSensorDataCard(
 
                     Text(
                         text = when {
-                            airHumidity < 0f -> "超出下限"
-                            airHumidity > 100f -> "超出上限"
-                            else -> "${(airHumidity * 100f).roundToInt() / 100.0}%RH"
+                            airHumidity < 0.0 -> "超出下限"
+                            airHumidity > 100.0 -> "超出上限"
+                            else -> "${airHumidity.format(2)}%RH"
                         },
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
@@ -1174,9 +1175,9 @@ fun MachineSensorDataCard(
 
                     Text(
                         text = when {
-                            soilTemperature < 0f -> "超出下限"
-                            soilTemperature > 100f -> "超出上限"
-                            else -> "${(soilTemperature * 100f).roundToInt() / 100.0}℃"
+                            soilTemperature < 0.0 -> "超出下限"
+                            soilTemperature > 100.0 -> "超出上限"
+                            else -> "${soilTemperature.format(2)}℃"
                         },
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
@@ -1272,9 +1273,9 @@ fun MachineSensorDataCard(
 
                     Text(
                         text = when {
-                            soilHumidity < 0f -> "超出下限"
-                            soilHumidity > 100f -> "超出上限"
-                            else -> "${(soilHumidity * 100).roundToInt() / 100.0}%RH"
+                            soilHumidity < 0.0 -> "超出下限"
+                            soilHumidity > 100.0 -> "超出上限"
+                            else -> "${soilHumidity.format(2)}%RH"
                         },
                         modifier = Modifier
                             .align(Alignment.CenterEnd)

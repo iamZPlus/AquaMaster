@@ -42,10 +42,10 @@ fun RefreshButton(
                             delay(3000)
                             ui.settings.machine.refreshing.off()
                             ui.settings.machine.refreshing.off()
-                            ui.settings.machine.sensor.air.temperature set 33.33f
-                            ui.settings.machine.sensor.air.humidity set 45.5f
-                            ui.settings.machine.sensor.soil.temperature set 101f
-                            ui.settings.machine.sensor.soil.humidity set -1f
+                            ui.settings.machine.sensor.air.temperature set 33.33
+                            ui.settings.machine.sensor.air.humidity set 45.5
+                            ui.settings.machine.sensor.soil.temperature set 101.0
+                            ui.settings.machine.sensor.soil.humidity set -1.0
                         }
                     }
                 }
